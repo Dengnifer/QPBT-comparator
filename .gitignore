@@ -2,3 +2,7 @@
 build/
 *.olean
 .DS_Store
+comparator
+landrun
+nanoda_lib
+comparator.local.json
