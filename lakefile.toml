@@ -1,0 +1,24 @@
+name = "QPBTComparator"
+version = "0.1.0"
+defaultTargets = ["QPBTComparator", "Challenge", "Solution"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "MIPStarRE"
+git = "https://github.com/Dengnifer/MIPStarRE-A.git"
+# Pin to the audited library commit; bump together with a regenerated
+# Challenge.lean (see the MIPStarRE-A repository's docs/comparator.md).
+rev = "b7353f7b9e276d45900a256da2d1870bb90b8fbe"
+
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"
+
+[[lean_lib]]
+name = "QPBTComparator"
