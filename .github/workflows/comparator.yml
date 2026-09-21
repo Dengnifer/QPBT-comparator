@@ -17,7 +17,7 @@ name: Comparator verification
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, issue-662-closure-20260921-diagnostic]
   pull_request:
   workflow_dispatch:
   schedule:
