@@ -100,3 +100,28 @@ tracked in the library repository under issue 645.
 The design follows the challenge repository of the companion low individual degree test
 formalization, [LionSR/LDT-comparator](https://github.com/LionSR/LDT-comparator), and the
 Lean reference manual's *Validating Proofs* chapter.
+
+
+## Why the challenge is more than one file
+
+`Challenge.lean` imports one Mathlib-only module per MIPStarRE module that
+contributes to the statement closure, under `Challenge/<library path>.lean`,
+and states the target theorems with `sorry`.  Each part imports Mathlib plus
+the mirrors of the library modules its source module imports; nothing here ever
+imports the library.
+
+The partition is not cosmetic.  Lean caches an abstracted nested proof and a
+`match` auxiliary *per module*, keyed by the statement, and names it after
+whichever declaration of that module first needed it; instance synthesis inside
+a module only sees what that module's imports declare; and comparator compares
+the full `ConstantInfo` of every closure constant, values and proofs included.
+A single-file challenge cannot reproduce an auxiliary name whenever the library
+needs the same fact in two modules, and it lets every instance reach every
+declaration.  Mirroring the library's module partition and import graph
+reproduces both by construction: with it, comparator accepts; without it, it
+reported 26 mismatching closure constants on exactly this library commit.
+
+The files are generated from the library by
+`scripts/comparator/check_challenge_drift.py --challenge qpbt --update` in the
+MIPStarRE-A repository, which also guards them against drift in that
+repository's CI.  The whole set is the human audit surface.

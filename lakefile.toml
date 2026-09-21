@@ -12,10 +12,12 @@ name = "MIPStarRE"
 git = "https://github.com/Dengnifer/MIPStarRE-A.git"
 # Pin to the audited library commit; bump together with a regenerated
 # Challenge.lean (see the MIPStarRE-A repository's docs/comparator.md).
-rev = "c2c1b478b76685570f399a843c44b5a26b26d679"
+rev = "4aec9ebedf6ca401e3f2d7b4bd90bd565d38f90d"
 
 [[lean_lib]]
 name = "Challenge"
+# one challenge module per contributing library module
+globs = ["Challenge", "Challenge.+"]
 
 [[lean_lib]]
 name = "Solution"

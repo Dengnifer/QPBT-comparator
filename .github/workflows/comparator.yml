@@ -3,7 +3,8 @@ name: Comparator verification
 # Runs the official leanprover/comparator: the MIPStarRE-A library (pinned in
 # lakefile.toml and lake-manifest.json) proves exactly the statements in
 # Challenge.lean using only propext, Quot.sound, Classical.choice, replayed
-# through the Lean kernel and the independent nanoda kernel.  See the
+# through the Lean kernel and the independent nanoda kernel.  The challenge
+# is Challenge.lean together with the modules under Challenge/.  See the
 # Validating Proofs chapter of the Lean reference manual for the trust model.
 #
 # The systemd-run guard from the comparator README is omitted: it hardens
@@ -34,13 +35,22 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Check Challenge.lean imports only Mathlib
+      - name: Check the challenge imports only Mathlib and its own modules
         run: |
-          bad=$(grep -E '^import' Challenge.lean | grep -v '^import Mathlib$' || true)
+          # The challenge is one Mathlib-only module per contributing library
+          # module (see the README): every module may import Mathlib and other
+          # Challenge modules, and nothing else -- in particular never the
+          # library it is meant to be an independent statement of.
+          files="Challenge.lean $(find Challenge -name '*.lean' | sort)"
+          bad=$(grep -hE '^import ' $files \
+                | grep -vE '^import Mathlib$|^import Challenge(\.[A-Za-z0-9_.]+)?$' \
+                || true)
           if [ -n "$bad" ]; then
-            echo "::error::Challenge.lean must import only Mathlib, found: $bad"
+            echo "::error::challenge modules may import only Mathlib and other"
+            echo "::error::challenge modules, found: $bad"
             exit 1
           fi
+          echo "checked $(printf '%s\n' $files | wc -l) challenge modules"
 
       - name: Check the library pin is a full commit hash
         run: |
