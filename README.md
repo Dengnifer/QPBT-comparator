@@ -53,11 +53,9 @@ landrun/nanoda comparison.
 ## Source Pin
 
 This candidate pins MIPStarRE-A commit
-`8bd40f9f77d27815f65d85e81a6570146657173a`, the exact PR 663 head from which
-the checked-in 31-file challenge was generated. Until that source commit is
-service-merged into `main`, results on this branch are preliminary evidence;
-the final artifact must be regenerated or repinned to the actual merged-main
-commit and verified again.
+`ecb97d1f66eec1e6fad964f144f78b91ce1fab36`, the service-merged PR 671 commit
+on `main`. The checked-in 31-file challenge is byte-identical to
+`scripts/comparator/expected/qpbt/` at that source commit.
 
 ## Regeneration
 
