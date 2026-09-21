@@ -1,5 +1,5 @@
 import Mathlib
-import Challenge.MIPStarRE.Quantum.FiniteMatrix.Basic
+import Challenge.MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 
 /-! Challenge mirror of `MIPStarRE/Quantum/Measurement.lean`.
 
@@ -34,17 +34,13 @@ structure Measurement (α : Type*) [Fintype α] (d : Type*) [Fintype d] [Decidab
   sum_eq_one : ∑ a, effect a = 1
 namespace Submeasurement
 
--- elaboration context of MIPStarRE/Quantum/Measurement.lean:52-94
-section
-variable {d : Type*} [Fintype d] [DecidableEq d]
-variable {α β : Type*} [Fintype α] [Fintype β]
-
--- source: MIPStarRE/Quantum/Measurement.lean:63-75  (MIPStarRE.Quantum.Submeasurement.postprocess)
+-- source: MIPStarRE/Quantum/Measurement.lean:63-76  (MIPStarRE.Quantum.Submeasurement.postprocess)
 /--
 Data processing: relabel the answer set by `f : α → β`, summing the effects over
 fibers.
 -/
-noncomputable def postprocess [DecidableEq α] [DecidableEq β]
+noncomputable def postprocess {d : Type*} [Fintype d] [DecidableEq d]
+    {α β : Type*} [Fintype α] [Fintype β] [DecidableEq α] [DecidableEq β]
     (M : Submeasurement α d) (f : α → β) : Submeasurement β d where
   effect b := ∑ a ∈ Finset.univ.filter (fun a => f a = b), M.effect a
   pos b := Finset.sum_nonneg fun a _ => M.pos a
@@ -53,16 +49,10 @@ noncomputable def postprocess [DecidableEq α] [DecidableEq β]
       ∑ b, ∑ a ∈ Finset.univ.filter (fun a => f a = b), M.effect a
           = ∑ a, M.effect a := Finset.sum_fiberwise Finset.univ f M.effect
       _ ≤ 1 := M.sum_le_one
-end  -- module scope
 end Submeasurement
 namespace Measurement
 
--- elaboration context of MIPStarRE/Quantum/Measurement.lean:96-223
-section
-variable {d : Type*} [Fintype d] [DecidableEq d]
-variable {α β : Type*} [Fintype α] [Fintype β]
-
--- source: MIPStarRE/Quantum/Measurement.lean:120-134  (MIPStarRE.Quantum.Measurement.postprocess)
+-- source: MIPStarRE/Quantum/Measurement.lean:121-136  (MIPStarRE.Quantum.Measurement.postprocess)
 /--
 Postprocess a complete measurement by relabeling outcomes.
 
@@ -70,7 +60,8 @@ This formalizes `references/ldt-paper/preliminaries.tex:169--180`: regrouping
 the effects along the fibers of `f` preserves the total operator, so a POVM
 remains a POVM after postprocessing.
 -/
-noncomputable def postprocess [DecidableEq α] [DecidableEq β]
+noncomputable def postprocess {d : Type*} [Fintype d] [DecidableEq d]
+    {α β : Type*} [Fintype α] [Fintype β] [DecidableEq α] [DecidableEq β]
     (M : Measurement α d) (f : α → β) : Measurement β d where
   toSubmeasurement := M.toSubmeasurement.postprocess f
   sum_eq_one := by
@@ -78,6 +69,5 @@ noncomputable def postprocess [DecidableEq α] [DecidableEq β]
       ∑ b, ∑ a ∈ Finset.univ.filter (fun a => f a = b), M.effect a
           = ∑ a, M.effect a := Finset.sum_fiberwise Finset.univ f M.effect
       _ = 1 := M.sum_eq_one
-end  -- module scope
 end Measurement
 end MIPStarRE.Quantum

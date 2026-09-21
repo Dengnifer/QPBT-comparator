@@ -1,6 +1,7 @@
 import Mathlib
 import Challenge.MIPStarRE.QPBT.Algebra.LowDegreeCode
 import Challenge.MIPStarRE.QPBT.Algebra.Pauli
+import Challenge.MIPStarRE.QPBT.Games.TypedCondLinear
 import Challenge.MIPStarRE.QPBT.Test.LowDegreeGame
 import Challenge.MIPStarRE.QPBT.Test.MagicSquare
 
@@ -347,14 +348,6 @@ inductive PauliAnswer (P : AdmissibleParams) where
   | msTriple (a : Fin 3 → ZMod 2)
   | pauliOutcome (a : PauliRegister P)
   deriving DecidableEq
-
--- source: MIPStarRE/QPBT/Test/PauliBasisTest.lean:491-496  (MIPStarRE.QPBT.pauliAnswerOrZero)
-/-- A formalization-only total relabeling from the global Pauli-test answer
-alphabet to a Pauli register. It folds wrong-form answers into zero so that a
-Pauli question yields a complete `PauliRegister`-indexed measurement. -/
-def pauliAnswerOrZero {P : AdmissibleParams} : PauliAnswer P → PauliRegister P
-  | .pauliOutcome u => u
-  | _ => 0
 
 -- source: MIPStarRE/QPBT/Test/PauliBasisTest.lean:498-508  (MIPStarRE.QPBT.PauliAnswerCode)
 /-- A finite sum code used only to construct the `Fintype` instance for the

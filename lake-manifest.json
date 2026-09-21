@@ -7,10 +7,10 @@
       "type": "git",
       "subDir": null,
       "scope": "",
-      "rev": "a942ecb56fd25933da51286070ddc615609edc76",
+      "rev": "8bd40f9f77d27815f65d85e81a6570146657173a",
       "name": "MIPStarRE",
       "manifestFile": "lake-manifest.json",
-      "inputRev": "a942ecb56fd25933da51286070ddc615609edc76",
+      "inputRev": "8bd40f9f77d27815f65d85e81a6570146657173a",
       "inherited": false,
       "configFile": "lakefile.toml"
     },

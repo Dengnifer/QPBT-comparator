@@ -3,7 +3,9 @@
     "solution_module": "Solution",
     "theorem_names": [
         "MIPStarRE.QPBT.pauli_soundness",
-        "MIPStarRE.QPBT.pauli_soundness_qubit"
+        "MIPStarRE.QPBT.pauli_soundness_qubit",
+        "MIPStarRE.QPBT.exists_spcc_value_one",
+        "MIPStarRE.QPBT.exists_ld_soundness"
     ],
     "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
     "enable_nanoda": true

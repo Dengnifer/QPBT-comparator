@@ -1,127 +1,73 @@
 # QPBT-comparator
 
-Comparator challenge for the Lean 4 formalization of the **quantum Pauli basis test** —
-the Pauli basis test section of the MIP\* = RE development — carried out in
-[Dengnifer/MIPStarRE-A](https://github.com/Dengnifer/MIPStarRE-A).
+Comparator challenge for the Lean 4 formalization of the quantum Pauli basis
+test in [Dengnifer/MIPStarRE-A](https://github.com/Dengnifer/MIPStarRE-A).
 
-The theorems verified here are
+The single comparator run checks these four registered headline declarations:
 
-- `MIPStarRE.QPBT.pauli_soundness` (blueprint `thm:pauli`), and
-- `MIPStarRE.QPBT.pauli_soundness_qubit` (blueprint `cor:pauli-binary`),
+- `MIPStarRE.QPBT.exists_spcc_value_one`;
+- `MIPStarRE.QPBT.exists_ld_soundness`;
+- `MIPStarRE.QPBT.pauli_soundness`; and
+- `MIPStarRE.QPBT.pauli_soundness_qubit`.
 
-checked in a single comparator run.
+## What The Check Establishes
 
-## What the check establishes
-
-The [comparator](https://github.com/leanprover/comparator) exports both environments with
-`lean4export` and compares them declaration by declaration. A green run says three things
-at once:
-
-1. every declaration in the *statement closure* of the two theorems is identical in
-   `Challenge.lean` — which imports Mathlib and nothing else — and in the library;
-2. the library proves those statements, under the same fully qualified names;
-3. the proofs use no axioms beyond `propext`, `Quot.sound` and `Classical.choice`, and
-   replay through the Lean kernel and through the independent `nanoda` kernel.
-
-So the entire human audit surface is `Challenge.lean`. A reader who agrees that it states
-the intended theorems does not have to read the library, the solution, or this README.
+The official [Lean comparator](https://github.com/leanprover/comparator)
+exports the challenge and solution environments and compares the complete
+statement closure declaration by declaration. A successful run establishes
+that the library proves exactly the four challenge statements, that every
+constant in their statement closures agrees, and that the proofs use no axioms
+beyond `propext`, `Quot.sound`, and `Classical.choice`. The workflow also
+replays the environment through Lean's kernel, `lean4checker`, and the
+independent nanoda kernel.
 
 ## Layout
 
-| File | What it is |
-|---|---|
-| `Challenge.lean` | Imports **only Mathlib**, re-declares verbatim and in dependency order every declaration in the statement closure of the two theorems, then states the theorems with `sorry`. Generated, not hand-edited; every declaration carries a `-- source:` provenance comment pointing into the library, where the docstrings cite the paper passages being encoded. |
-| `Solution.lean` | Imports the library, pinned by commit in `lakefile.toml`. No bridging lemmas: the library proves the same statements under the same names, so importing it is the whole solution. |
-| `QPBTComparator.lean` | Package root, imports `Solution`; it exists so external checkers can be pointed at one module. |
-| `comparator.json` | The comparator configuration: both theorem names, and `propext`, `Quot.sound`, `Classical.choice` as the only permitted axioms. |
-| `verify.sh` | Runs the official comparator with the real landrun sandbox and the nanoda external kernel. `--fake-landrun` drops the sandbox for hosts without Landlock. |
-| `lakefile.toml`, `lake-manifest.json`, `lean-toolchain` | The build. Mathlib and every other dependency are pinned to exactly the revisions the library itself is pinned to, so the two environments cannot drift apart through a dependency. |
-| `.github/workflows/comparator.yml` | The authoritative run: real sandbox, external kernel, `lean4checker` re-check, on every push and pull request and once a week. |
+`Challenge.lean` imports 30 generated modules below `Challenge/`, one for each
+contributing library module. Those 31 files import only Mathlib and other
+generated challenge modules. Mirroring the library module partition is
+necessary because compiler-generated auxiliary names and instance visibility
+are module-sensitive.
 
-## Running the check
+`Solution.lean` imports the four library theorem modules. `comparator.json`
+names the four targets and the three permitted axioms. `lakefile.toml` and
+`lake-manifest.json` pin the exact library revision used to generate the
+challenge.
 
-Linux with Landlock (kernel ≥ 5.13), plus Go, Rust, `jq` and `elan`:
+## Verification
+
+On Linux with Landlock, Go, a current Rust toolchain, `jq`, and `elan`, run:
 
 ```sh
 ./verify.sh
 ```
 
-`verify.sh` fetches and builds the comparator, `landrun` and `nanoda` at pinned revisions
-on first use, then runs the comparison. Expect a long first run: it builds the library.
+This invokes the unchanged official comparator with real landrun and nanoda.
+For diagnostics only, `./verify.sh --fake-landrun` substitutes the comparator's
+development sandbox and disables nanoda; that mode is not official acceptance.
 
-On macOS, or on any host without Landlock, Go or a recent Rust:
+The authoritative GitHub workflow checks the Mathlib-only import boundary,
+the full revision pin, Lean compilation and kernel replay, then runs the real
+landrun/nanoda comparison.
+
+## Source Pin
+
+This candidate pins MIPStarRE-A commit
+`8bd40f9f77d27815f65d85e81a6570146657173a`, the exact PR 663 head from which
+the checked-in 31-file challenge was generated. Until that source commit is
+service-merged into `main`, results on this branch are preliminary evidence;
+the final artifact must be regenerated or repinned to the actual merged-main
+commit and verified again.
+
+## Regeneration
+
+From the pinned MIPStarRE-A checkout, run:
 
 ```sh
-./verify.sh --fake-landrun
+python3 scripts/comparator/check_challenge_drift.py \
+  --root . --challenge qpbt --update
 ```
 
-This is a **functional check only**. It substitutes comparator's own development stub for
-the sandbox — the stub prints `WARNING: THIS IS NOT REAL LANDRUN!` and runs the command
-unsandboxed — and turns `enable_nanoda` off. The export comparison and the axiom whitelist
-are unchanged, so on a trusted checkout the logical content of a passing run is the same;
-what is dropped is the guarantee that a hostile `Solution.lean` cannot tamper with the
-run. Treat the workflow in `.github/workflows/` as the authoritative result.
-
-## Which library commit is pinned
-
-`lakefile.toml` and `lake-manifest.json` pin `MIPStarRE` to one full commit hash, and the
-CI refuses anything else. **The pin currently points at a commit on the development branch
-`issue-645-qpbt-comparator-20260919` (pull request 661), not at `main`.** It will move to
-the merged `main` commit once that pull request lands; the pin and `Challenge.lean` always
-move together, because the challenge is generated from the library at that exact commit.
-
-## Regenerating after a library change
-
-`Challenge.lean` is generated. After any change to a declaration in the statement closure:
-
-1. in the library repository, run
-   `python3 scripts/comparator/check_challenge_drift.py --root . --challenge qpbt --update`;
-2. copy `scripts/comparator/expected/ChallengeQPBT.lean.expected` here as `Challenge.lean`;
-3. bump `rev` in `lakefile.toml` and the `MIPStarRE` entry of `lake-manifest.json` to the
-   library commit it was generated from.
-
-The library's own CI fails if the checked-in expected copy drifts from what the tooling
-produces. The regeneration tooling and the trust model live in the library repository, in
-`scripts/comparator/` and `docs/comparator.md`.
-
-Note that a declaration in the closure must be reproducible *by name*. A `local instance`
-or an instance argument that is a proof gets an auto-generated name derived from whichever
-declaration happens to need it first, and that ordering is not the same in the library and
-in a Mathlib-only file; when the comparator reports `Const does not match`, this is the
-usual cause, and the fix is to give the declaration an explicit name in the library.
-
-## Status
-
-The check does not pass yet. The current state, and the outstanding library-side fix, are
-tracked in the library repository under issue 645.
-
----
-
-The design follows the challenge repository of the companion low individual degree test
-formalization, [LionSR/LDT-comparator](https://github.com/LionSR/LDT-comparator), and the
-Lean reference manual's *Validating Proofs* chapter.
-
-
-## Why the challenge is more than one file
-
-`Challenge.lean` imports one Mathlib-only module per MIPStarRE module that
-contributes to the statement closure, under `Challenge/<library path>.lean`,
-and states the target theorems with `sorry`.  Each part imports Mathlib plus
-the mirrors of the library modules its source module imports; nothing here ever
-imports the library.
-
-The partition is not cosmetic.  Lean caches an abstracted nested proof and a
-`match` auxiliary *per module*, keyed by the statement, and names it after
-whichever declaration of that module first needed it; instance synthesis inside
-a module only sees what that module's imports declare; and comparator compares
-the full `ConstantInfo` of every closure constant, values and proofs included.
-A single-file challenge cannot reproduce an auxiliary name whenever the library
-needs the same fact in two modules, and it lets every instance reach every
-declaration.  Mirroring the library's module partition and import graph
-reproduces both by construction: with it, comparator accepts; without it, it
-reported 26 mismatching closure constants on exactly this library commit.
-
-The files are generated from the library by
-`scripts/comparator/check_challenge_drift.py --challenge qpbt --update` in the
-MIPStarRE-A repository, which also guards them against drift in that
-repository's CI.  The whole set is the human audit surface.
+Then replace this repository's `Challenge.lean` and `Challenge/` with the
+contents of `scripts/comparator/expected/qpbt/`, and update the MIPStarRE
+revision in both Lake files in the same commit.
