@@ -3,7 +3,7 @@
   "packagesDir": ".lake/packages",
   "packages": [
     {
-      "url": "https://github.com/Dengnifer/MIPStarRE-A.git",
+      "url": "https://github.com/Dengnifer/MIPStarRE-QPBT.git",
       "type": "git",
       "subDir": null,
       "scope": "",

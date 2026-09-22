@@ -9,9 +9,9 @@ maxSynthPendingDepth = 3
 
 [[require]]
 name = "MIPStarRE"
-git = "https://github.com/Dengnifer/MIPStarRE-A.git"
+git = "https://github.com/Dengnifer/MIPStarRE-QPBT.git"
 # Pin to the audited library commit; bump together with a regenerated
-# Challenge.lean (see the MIPStarRE-A repository's docs/comparator.md).
+# Challenge.lean (see the MIPStarRE-QPBT repository's docs/comparator.md).
 rev = "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
 
 [[lean_lib]]
