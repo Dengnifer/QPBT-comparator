@@ -1,0 +1,970 @@
+{
+  "checker": "tools/palomar/check.py",
+  "checks": [
+    {
+      "details": {
+        "errors": []
+      },
+      "evidence": "static",
+      "id": "upstream.snapshots",
+      "status": "pass",
+      "summary": "vendored upstream policy snapshots match their pins"
+    },
+    {
+      "details": {
+        "lakefiles": [
+          "lakefile.toml"
+        ],
+        "missing": []
+      },
+      "evidence": "static",
+      "id": "layout.project_root",
+      "status": "pass",
+      "summary": "the selected project is the repository root with one lakefile.toml"
+    },
+    {
+      "details": {
+        "byte_limit": 524288000,
+        "bytes": 277969,
+        "compiled_artifacts": [],
+        "lfs_pointers": [],
+        "submodules": []
+      },
+      "evidence": "static",
+      "id": "repository.integrity",
+      "status": "pass",
+      "summary": "repository source snapshot meets static integrity limits"
+    },
+    {
+      "details": {
+        "bytes": 3650,
+        "limit": 262144
+      },
+      "evidence": "static",
+      "id": "metadata.size",
+      "status": "pass",
+      "summary": "metadata is 3650 bytes (limit 262144)"
+    },
+    {
+      "details": {
+        "errors": []
+      },
+      "evidence": "schema",
+      "id": "metadata.schema",
+      "status": "pass",
+      "summary": "formalization.yaml validates against upstream v0.4"
+    },
+    {
+      "details": {
+        "errors": []
+      },
+      "evidence": "static",
+      "id": "metadata.palomar_minimum",
+      "status": "pass",
+      "summary": "metadata satisfies the selected Palomar semantic minimum"
+    },
+    {
+      "details": {
+        "invalid_utf8": [],
+        "symlinks": []
+      },
+      "evidence": "static",
+      "id": "source.wrapper_integrity",
+      "status": "pass",
+      "summary": "wrapper Lean sources are regular UTF-8 files"
+    },
+    {
+      "details": {
+        "examples": [
+          "Challenge.lean",
+          "Challenge/MIPStarRE/LDT/Basic/Distribution.lean",
+          "Challenge/MIPStarRE/LDT/Basic/ParametersBase.lean",
+          "Challenge/MIPStarRE/LDT/Preliminaries/Polynomials.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/Coefficients.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/FieldBasis.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/Lines.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/LowDegreeCode.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/Pauli.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/PauliTheorems.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasis.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasisTheorems.lean",
+          "Challenge/MIPStarRE/QPBT/Algebra/Subspaces.lean",
+          "Challenge/MIPStarRE/QPBT/Games/CondLinear.lean",
+          "Challenge/MIPStarRE/QPBT/Games/Consistency.lean",
+          "Challenge/MIPStarRE/QPBT/Games/Defs.lean",
+          "Challenge/MIPStarRE/QPBT/Games/DistributionAux.lean",
+          "Challenge/MIPStarRE/QPBT/Games/StrategyClasses.lean",
+          "Challenge/MIPStarRE/QPBT/Games/TypedCondLinear.lean",
+          "Challenge/MIPStarRE/QPBT/Observables/WinImplications/Setup.lean",
+          "Challenge/MIPStarRE/QPBT/State.lean",
+          "Challenge/MIPStarRE/QPBT/Test/Completeness.lean",
+          "Challenge/MIPStarRE/QPBT/Test/LowDegreeGame.lean",
+          "Challenge/MIPStarRE/QPBT/Test/LowDegreeGameMeasurements.lean",
+          "Challenge/MIPStarRE/QPBT/Test/MagicSquare.lean",
+          "Challenge/MIPStarRE/QPBT/Test/PauliBasisTest.lean",
+          "Challenge/MIPStarRE/QPBT/Test/QubitForm.lean",
+          "Challenge/MIPStarRE/QPBT/Test/SoundnessDefs.lean",
+          "Challenge/MIPStarRE/Quantum/FiniteMatrix/Basic.lean",
+          "Challenge/MIPStarRE/Quantum/FiniteMatrix/NormalizedTrace.lean",
+          "Challenge/MIPStarRE/Quantum/Measurement.lean",
+          "QPBTComparator.lean",
+          "Solution.lean"
+        ],
+        "files_checked": 33
+      },
+      "evidence": "static",
+      "id": "source.wrapper_modules",
+      "status": "fail",
+      "summary": "33 wrapper Lean sources lack module headers"
+    },
+    {
+      "details": {
+        "examples": [],
+        "maximum_lines": 614
+      },
+      "evidence": "static",
+      "id": "source.wrapper_line_cap",
+      "status": "pass",
+      "summary": "all wrapper Lean sources are at most 10000 physical lines"
+    },
+    {
+      "details": {
+        "value": "leanprover/lean4:v4.32.0"
+      },
+      "evidence": "static",
+      "id": "toolchain.pinned_release",
+      "status": "pass",
+      "summary": "toolchain is pinned to v4.32.0"
+    },
+    {
+      "details": {
+        "minimum": "v4.35.0-rc2",
+        "selected": "v4.32.0"
+      },
+      "evidence": "static",
+      "id": "toolchain.supported",
+      "status": "fail",
+      "summary": "Lean v4.32.0 is below the current minimum v4.35.0-rc2"
+    },
+    {
+      "details": {
+        "input_revision": "v4.32.0",
+        "revision": "81a5d257c8e410db227a6665ed08f64fea08e997",
+        "url": "https://github.com/leanprover-community/mathlib4"
+      },
+      "evidence": "static",
+      "id": "mathlib.wrapper_pin",
+      "status": "pass",
+      "summary": "wrapper manifest pins canonical Mathlib at the selected Lean release"
+    },
+    {
+      "details": {
+        "lakefile_revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36",
+        "manifest_input_revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36",
+        "manifest_revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36",
+        "metadata_revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+      },
+      "evidence": "static",
+      "id": "substantive.immutable_pin",
+      "status": "pass",
+      "summary": "Lake, manifest, and metadata agree on one immutable substantive revision"
+    },
+    {
+      "details": {
+        "expected": "Dengnifer/MIPStarRE-QPBT",
+        "lakefile": "Dengnifer/MIPStarRE-A",
+        "manifest": "Dengnifer/MIPStarRE-A",
+        "metadata": "Dengnifer/MIPStarRE-QPBT"
+      },
+      "evidence": "static",
+      "id": "substantive.canonical_repository",
+      "status": "fail",
+      "summary": "the substantive dependency still uses a noncanonical repository name"
+    },
+    {
+      "details": {
+        "candidates": [
+          "LICENSE"
+        ],
+        "metadata": "Apache-2.0",
+        "recognized": "Apache-2.0"
+      },
+      "evidence": "static",
+      "id": "license.root",
+      "status": "pass",
+      "summary": "exactly one root license is recognized as Apache-2.0 and matches metadata"
+    },
+    {
+      "details": {
+        "actual_keys": [
+          "challenge_module",
+          "enable_nanoda",
+          "permitted_axioms",
+          "solution_module",
+          "theorem_names"
+        ],
+        "enable_nanoda": true,
+        "note": "Palomar's official verifier injects protected NanoDa and con-ron commands; this field is compatibility data, not kernel evidence.",
+        "permitted_axioms": [
+          "propext",
+          "Quot.sound",
+          "Classical.choice"
+        ],
+        "required_keys": [
+          "challenge_module",
+          "permitted_axioms",
+          "solution_module",
+          "theorem_names"
+        ],
+        "theorem_names": [
+          "MIPStarRE.QPBT.pauli_soundness",
+          "MIPStarRE.QPBT.pauli_soundness_qubit",
+          "MIPStarRE.QPBT.exists_spcc_value_one",
+          "MIPStarRE.QPBT.exists_ld_soundness"
+        ]
+      },
+      "evidence": "static",
+      "id": "comparator.configuration",
+      "status": "pass",
+      "summary": "comparator config names the four targets, only standard axioms, and NanoDa"
+    },
+    {
+      "details": {
+        "challenge": "Challenge.lean",
+        "solution": "Solution.lean"
+      },
+      "evidence": "static",
+      "id": "comparator.modules",
+      "status": "pass",
+      "summary": "Challenge and Solution select distinct regular source files"
+    },
+    {
+      "details": {
+        "byte_limit": 102400,
+        "bytes": 13389,
+        "line_limit": 1000,
+        "lines": 225
+      },
+      "evidence": "static",
+      "id": "challenge.size",
+      "status": "pass",
+      "summary": "Challenge is 225 lines and 13389 bytes"
+    },
+    {
+      "details": {
+        "local_closure_bytes": 181816,
+        "local_closure_files": 31,
+        "local_closure_lines": 3956,
+        "local_dependencies": [
+          "Challenge.MIPStarRE.LDT.Basic.Distribution",
+          "Challenge.MIPStarRE.LDT.Basic.ParametersBase",
+          "Challenge.MIPStarRE.LDT.Preliminaries.Polynomials",
+          "Challenge.MIPStarRE.QPBT.Algebra.Coefficients",
+          "Challenge.MIPStarRE.QPBT.Algebra.FieldBasis",
+          "Challenge.MIPStarRE.QPBT.Algebra.Lines",
+          "Challenge.MIPStarRE.QPBT.Algebra.LowDegreeCode",
+          "Challenge.MIPStarRE.QPBT.Algebra.Pauli",
+          "Challenge.MIPStarRE.QPBT.Algebra.PauliTheorems",
+          "Challenge.MIPStarRE.QPBT.Algebra.SelfDualBasis",
+          "Challenge.MIPStarRE.QPBT.Algebra.SelfDualBasisTheorems",
+          "Challenge.MIPStarRE.QPBT.Algebra.Subspaces",
+          "Challenge.MIPStarRE.QPBT.Games.CondLinear",
+          "Challenge.MIPStarRE.QPBT.Games.Consistency",
+          "Challenge.MIPStarRE.QPBT.Games.Defs",
+          "Challenge.MIPStarRE.QPBT.Games.DistributionAux",
+          "Challenge.MIPStarRE.QPBT.Games.StrategyClasses",
+          "Challenge.MIPStarRE.QPBT.Games.TypedCondLinear",
+          "Challenge.MIPStarRE.QPBT.Observables.WinImplications.Setup",
+          "Challenge.MIPStarRE.QPBT.State",
+          "Challenge.MIPStarRE.QPBT.Test.Completeness",
+          "Challenge.MIPStarRE.QPBT.Test.LowDegreeGame",
+          "Challenge.MIPStarRE.QPBT.Test.LowDegreeGameMeasurements",
+          "Challenge.MIPStarRE.QPBT.Test.MagicSquare",
+          "Challenge.MIPStarRE.QPBT.Test.PauliBasisTest",
+          "Challenge.MIPStarRE.QPBT.Test.QubitForm",
+          "Challenge.MIPStarRE.QPBT.Test.SoundnessDefs",
+          "Challenge.MIPStarRE.Quantum.FiniteMatrix.Basic",
+          "Challenge.MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace",
+          "Challenge.MIPStarRE.Quantum.Measurement"
+        ],
+        "trusted_imports": [
+          "Mathlib"
+        ],
+        "unknown_imports": []
+      },
+      "evidence": "static",
+      "id": "challenge.static_import_boundary",
+      "status": "fail",
+      "summary": "Challenge reaches local or untrusted source modules"
+    },
+    {
+      "details": {
+        "files_checked": 711,
+        "maximum_lines": 1000,
+        "missing_module_count": 711,
+        "missing_module_examples": [
+          "MIPStarRE.lean",
+          "MIPStarRE/LDT.lean",
+          "MIPStarRE/LDT/Basic/AxisParallelLine.lean",
+          "MIPStarRE/LDT/Basic/DiagonalLine.lean",
+          "MIPStarRE/LDT/Basic/Distribution.lean",
+          "MIPStarRE/LDT/Basic/DistributionAvg.lean",
+          "MIPStarRE/LDT/Basic/DistributionMapAverages.lean",
+          "MIPStarRE/LDT/Basic/DistributionPMF.lean",
+          "MIPStarRE/LDT/Basic/DistributionProduct.lean",
+          "MIPStarRE/LDT/Basic/DistributionUniform.lean",
+          "MIPStarRE/LDT/Basic/DistributionUniformSums.lean",
+          "MIPStarRE/LDT/Basic/LinePolynomialEmbedding.lean",
+          "MIPStarRE/LDT/Basic/LinePolynomials.lean",
+          "MIPStarRE/LDT/Basic/LowDegreePolynomial.lean",
+          "MIPStarRE/LDT/Basic/MeasurementLift.lean",
+          "MIPStarRE/LDT/Basic/OpFamily.lean",
+          "MIPStarRE/LDT/Basic/OperatorExpectations.lean",
+          "MIPStarRE/LDT/Basic/PMFAverages.lean",
+          "MIPStarRE/LDT/Basic/PMFUniformAverages.lean",
+          "MIPStarRE/LDT/Basic/ParametersBase.lean",
+          "MIPStarRE/LDT/Basic/ParametersFiniteAnswers.lean",
+          "MIPStarRE/LDT/Basic/QuantumState.lean",
+          "MIPStarRE/LDT/Basic/RpowBounds.lean",
+          "MIPStarRE/LDT/Basic/SqrtBounds.lean",
+          "MIPStarRE/LDT/Basic/SubMeasurementCore.lean",
+          "MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean",
+          "MIPStarRE/LDT/Basic/TensorPlacement.lean",
+          "MIPStarRE/LDT/Commutativity/Defs/Core.lean",
+          "MIPStarRE/LDT/Commutativity/Defs/Normalization.lean",
+          "MIPStarRE/LDT/Commutativity/Defs/Stability.lean",
+          "MIPStarRE/LDT/Commutativity/EvaluatedSliceBounds/PhaseOneThree.lean",
+          "MIPStarRE/LDT/Commutativity/EvaluatedSliceCommutation/Averages.lean",
+          "MIPStarRE/LDT/Commutativity/EvaluatedSliceCommutation/Consequences.lean",
+          "MIPStarRE/LDT/Commutativity/GCommStability/OverlapOne.lean",
+          "MIPStarRE/LDT/Commutativity/GCommStability/OverlapTwo.lean",
+          "MIPStarRE/LDT/Commutativity/GCommStability/Scalar/Common.lean",
+          "MIPStarRE/LDT/Commutativity/GCommStability/Scalar/First.lean",
+          "MIPStarRE/LDT/Commutativity/GCommStability/Scalar/RawSecond.lean",
+          "MIPStarRE/LDT/Commutativity/GCommStability/Scalar/Second.lean",
+          "MIPStarRE/LDT/Commutativity/Main/Auxiliary/HEvalTransport.lean",
+          "MIPStarRE/LDT/Commutativity/Main/Auxiliary/ScalarMarginalization.lean",
+          "MIPStarRE/LDT/Commutativity/Main/EvaluatedQuestions.lean",
+          "MIPStarRE/LDT/Commutativity/Main/Results.lean",
+          "MIPStarRE/LDT/Commutativity/Scaffold/Core.lean",
+          "MIPStarRE/LDT/Commutativity/Scaffold/Products.lean",
+          "MIPStarRE/LDT/Commutativity/Scaffold/Symmetry.lean",
+          "MIPStarRE/LDT/Commutativity/ScalarApproximation/Core.lean",
+          "MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic/Normalization.lean",
+          "MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic/PointSwap.lean",
+          "MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic/Reindexing.lean"
+        ],
+        "submodules": [],
+        "symlinks": [],
+        "too_long_count": 0,
+        "too_long_examples": []
+      },
+      "evidence": "static",
+      "id": "source.substantive_requirements",
+      "status": "fail",
+      "summary": "pinned substantive Lean sources fail module or line requirements"
+    },
+    {
+      "details": {
+        "substantive_mathlib": "81a5d257c8e410db227a6665ed08f64fea08e997",
+        "substantive_toolchain": "leanprover/lean4:v4.32.0",
+        "wrapper_mathlib": "81a5d257c8e410db227a6665ed08f64fea08e997",
+        "wrapper_toolchain": "leanprover/lean4:v4.32.0"
+      },
+      "evidence": "static",
+      "id": "mathlib.substantive_match",
+      "status": "pass",
+      "summary": "wrapper and substantive repository use the same Lean and Mathlib revisions"
+    },
+    {
+      "details": {
+        "substantive_examples": [
+          {
+            "line": 232,
+            "path": "MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean"
+          },
+          {
+            "line": 271,
+            "path": "MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean"
+          },
+          {
+            "line": 22,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 49,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 54,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 81,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 96,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 97,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 100,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 132,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 146,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 148,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 153,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 163,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 171,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 193,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 227,
+            "path": "MIPStarRE/LDT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 355,
+            "path": "MIPStarRE/LDT/Test/Classical.lean"
+          },
+          {
+            "line": 57,
+            "path": "MIPStarRE/QPBT/Combining/Apply.lean"
+          },
+          {
+            "line": 22,
+            "path": "MIPStarRE/QPBT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 27,
+            "path": "MIPStarRE/QPBT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 28,
+            "path": "MIPStarRE/QPBT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 84,
+            "path": "MIPStarRE/QPBT/Test/AxiomAudit.lean"
+          },
+          {
+            "line": 16,
+            "path": "MIPStarRE/QPBT/Test/QubitForm.lean"
+          },
+          {
+            "line": 420,
+            "path": "MIPStarRE/QPBT/Test/QubitForm.lean"
+          },
+          {
+            "line": 6,
+            "path": "results/telemetry/native-audits/pr549-01a0a525/PR549NativeChecks.lean"
+          },
+          {
+            "line": 71,
+            "path": "results/telemetry/native-audits/pr549-01a0a525/PR549NativeChecks.lean"
+          },
+          {
+            "line": 39,
+            "path": "scripts/Checkdecls.lean"
+          },
+          {
+            "line": 44,
+            "path": "scripts/comparator/challenge_footer.lean"
+          },
+          {
+            "line": 14,
+            "path": "scripts/comparator/challenge_header.lean"
+          },
+          {
+            "line": 15,
+            "path": "scripts/comparator/challenge_qpbt_footer.lean"
+          },
+          {
+            "line": 49,
+            "path": "scripts/comparator/challenge_qpbt_footer.lean"
+          },
+          {
+            "line": 76,
+            "path": "scripts/comparator/challenge_qpbt_footer.lean"
+          },
+          {
+            "line": 88,
+            "path": "scripts/comparator/challenge_qpbt_footer.lean"
+          },
+          {
+            "line": 104,
+            "path": "scripts/comparator/challenge_qpbt_footer.lean"
+          },
+          {
+            "line": 14,
+            "path": "scripts/comparator/challenge_qpbt_header.lean"
+          },
+          {
+            "line": 44,
+            "path": "scripts/comparator/expected/qpbt/Challenge.lean"
+          },
+          {
+            "line": 134,
+            "path": "scripts/comparator/expected/qpbt/Challenge.lean"
+          },
+          {
+            "line": 168,
+            "path": "scripts/comparator/expected/qpbt/Challenge.lean"
+          },
+          {
+            "line": 195,
+            "path": "scripts/comparator/expected/qpbt/Challenge.lean"
+          },
+          {
+            "line": 207,
+            "path": "scripts/comparator/expected/qpbt/Challenge.lean"
+          },
+          {
+            "line": 223,
+            "path": "scripts/comparator/expected/qpbt/Challenge.lean"
+          }
+        ],
+        "substantive_matches_at_least": 42,
+        "wrapper_examples": [
+          {
+            "line": 44,
+            "path": "Challenge.lean"
+          },
+          {
+            "line": 134,
+            "path": "Challenge.lean"
+          },
+          {
+            "line": 168,
+            "path": "Challenge.lean"
+          },
+          {
+            "line": 195,
+            "path": "Challenge.lean"
+          },
+          {
+            "line": 207,
+            "path": "Challenge.lean"
+          },
+          {
+            "line": 223,
+            "path": "Challenge.lean"
+          }
+        ],
+        "wrapper_matches_at_least": 6
+      },
+      "evidence": "static",
+      "id": "proof.lexical_source_scan",
+      "status": "unknown",
+      "summary": "lexical scans are recorded but cannot certify proof completion or axiom closure"
+    },
+    {
+      "details": {
+        "required_axioms": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "required_kernels": [
+          "Lean kernel",
+          "leanchecker",
+          "NanoDa",
+          "con-ron"
+        ],
+        "required_targets": [
+          "MIPStarRE.QPBT.pauli_soundness",
+          "MIPStarRE.QPBT.pauli_soundness_qubit",
+          "MIPStarRE.QPBT.exists_spcc_value_one",
+          "MIPStarRE.QPBT.exists_ld_soundness"
+        ]
+      },
+      "evidence": "authoritative",
+      "id": "proof.authoritative_comparator",
+      "status": "unknown",
+      "summary": "no official final-snapshot Palomar/comparator report is attached; proof, axiom, and independent-kernel claims are not certified here"
+    }
+  ],
+  "evidence_model": {
+    "authoritative": "kernel/comparator evidence from an official final-snapshot run",
+    "schema": "validation against a byte-pinned public schema",
+    "static": "non-executing source/configuration inspection"
+  },
+  "inputs": {
+    "substantive": {
+      "lean_files": 711,
+      "lean_sources_sha256": "5cebce9ec027b919288f05d23adbffe3c4a8940ae88397b3b4b91e7f65d008f6",
+      "repository": "Dengnifer/MIPStarRE-QPBT",
+      "revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36",
+      "special_files": {
+        "LICENSE": {
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        "lake-manifest.json": {
+          "bytes": 3143,
+          "sha256": "d5214aba0b440dcdfd606e517e26c6f7147404c4f29afc5e79b065a64cd3ab03"
+        },
+        "lakefile.toml": {
+          "bytes": 455,
+          "sha256": "72ab45698ba6f6f1e08734c8cfd17b8409be3ced076ef5d5e15cedb091079e18"
+        },
+        "lean-toolchain": {
+          "bytes": 25,
+          "sha256": "2773c517aa90b66ea8a2c52bddddf84393157797f8341be0df45294fff7fd32e"
+        }
+      },
+      "tree": "b4a397df94e56e31b5e97154ce885ae62bc190f6"
+    },
+    "upstream": {
+      "browser_policy": {
+        "path": "tools/palomar/upstream/browser-preflight-policy.json",
+        "revision": "65f0154ed776cd26c224254aa57b379137f28b0d",
+        "sha256": "d3d0003b7a043695c5cb06c117253e248406e0723bbfe2cac50afb703fa97046",
+        "url": "https://raw.githubusercontent.com/PalomarRegistry/PalomarSubmission/65f0154ed776cd26c224254aa57b379137f28b0d/browser-preflight-policy.json"
+      },
+      "formalization_schema": {
+        "path": "tools/palomar/upstream/formalization-v0.4.schema.json",
+        "revision": "99c678e569c7c4c0772db297c5ddd5e4c9b6322e",
+        "sha256": "25ff6b25ca4511635aff4443cf20480c15e59dddf19591c730950b442ea54fce",
+        "url": "https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/99c678e569c7c4c0772db297c5ddd5e4c9b6322e/schema/v0.4.schema.json"
+      },
+      "toolchains": {
+        "path": "tools/palomar/upstream/toolchains.json",
+        "revision": "65f0154ed776cd26c224254aa57b379137f28b0d",
+        "sha256": "fd40347e4b586e7c42233b35f11efb006d25033b9a7ded9565719edf7aa98354",
+        "url": "https://raw.githubusercontent.com/PalomarRegistry/PalomarSubmission/65f0154ed776cd26c224254aa57b379137f28b0d/toolchains.json"
+      }
+    },
+    "wrapper": {
+      "files": [
+        {
+          "bytes": 3860,
+          "kind": "file",
+          "path": ".github/workflows/comparator.yml",
+          "sha256": "6e7a3e0452e7474a7991a72c3c847cc7e6d22405888c9729dacf141880d5f0fc"
+        },
+        {
+          "bytes": 107,
+          "kind": "file",
+          "path": ".gitignore",
+          "sha256": "d8bc971cc780c51c8c36b0e7d3046fffcaab33094ecda4e7225d2be868e5679a"
+        },
+        {
+          "bytes": 6593,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/LDT/Basic/Distribution.lean",
+          "sha256": "732b279ab49a36923d2fcdf1721ddc88a807a698d5b55427c1492ae89fc17761"
+        },
+        {
+          "bytes": 1078,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/LDT/Basic/ParametersBase.lean",
+          "sha256": "49e35470550907217d4774a92249a1f0ddbd3cdb8ea28d072e7171eb175afd0f"
+        },
+        {
+          "bytes": 879,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/LDT/Preliminaries/Polynomials.lean",
+          "sha256": "aa20d7167fc545521aa6804e1c53cfc57ef9cd22bb9cd0d96b29edc91fcf9f8a"
+        },
+        {
+          "bytes": 896,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/Coefficients.lean",
+          "sha256": "80b577b422a812bf9e80ce3d32d80c5267082f4c6e1f452bae553a03a1644e5b"
+        },
+        {
+          "bytes": 25746,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/FieldBasis.lean",
+          "sha256": "ea84484b624f2a07fed7c397a93e1c576493229c92fd8ad6e8c362ea00f310c9"
+        },
+        {
+          "bytes": 1545,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/Lines.lean",
+          "sha256": "de3ecc7573f0f32706a7c6a8d81b37f91a5ee37f356bacaa15fe5ec5c458e370"
+        },
+        {
+          "bytes": 2761,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/LowDegreeCode.lean",
+          "sha256": "192812c010c2401c3f60d3e673f457fe0ae781d81100f1462cc62cc894608d9f"
+        },
+        {
+          "bytes": 3386,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/Pauli.lean",
+          "sha256": "c8c59ec6c171b733e1d1267df00a1efe35d3ce849aff1591a575414cf65c8075"
+        },
+        {
+          "bytes": 1237,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/PauliTheorems.lean",
+          "sha256": "ed3f74220230a559438a0b815b87598fa6dabd5a75db7c60a6bb96cbec984ec3"
+        },
+        {
+          "bytes": 1600,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasis.lean",
+          "sha256": "2283e9ec0a05ee5bdd3a16bc77f04db8c000a4b7cb666ed46650a5f8ec83d4df"
+        },
+        {
+          "bytes": 990,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasisTheorems.lean",
+          "sha256": "ededadbc622d7480bf6bd1f2a96b5d23a0638db481fa78468b42f47a36b9c2c4"
+        },
+        {
+          "bytes": 10509,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Algebra/Subspaces.lean",
+          "sha256": "f42789b0ba2de8496c91861d0ada5333297beaa540fc7da05741743f86859693"
+        },
+        {
+          "bytes": 2605,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Games/CondLinear.lean",
+          "sha256": "2cf0f4ef97d2b5b217f0c8a7a43d00acd5042814639e7f9d0aae188fb3668281"
+        },
+        {
+          "bytes": 1320,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Games/Consistency.lean",
+          "sha256": "a1981f9f8b109aa888f34fc929610fdaa713274a2ac4514db1cfc94befb9363a"
+        },
+        {
+          "bytes": 4975,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Games/Defs.lean",
+          "sha256": "fd18a6feb5e0e3d9b5abd5f66bbe8e2dc713ba625fb08ab88b4589d7bf3d546a"
+        },
+        {
+          "bytes": 8245,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Games/DistributionAux.lean",
+          "sha256": "880bbe1d72365a0acbd7dee3933db23160321fb15c55fc0afb28b5b39ae28990"
+        },
+        {
+          "bytes": 5802,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Games/StrategyClasses.lean",
+          "sha256": "263ca2f3c64028fb1a2b561e8216b3e86e42ac4ed246324e4fdcf83da25fff47"
+        },
+        {
+          "bytes": 5176,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Games/TypedCondLinear.lean",
+          "sha256": "3476b430a45aef4442c7cc044e9986ed261d4c58c9a8e477d1ae308a6667a5d8"
+        },
+        {
+          "bytes": 1230,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Observables/WinImplications/Setup.lean",
+          "sha256": "f37d237155685695225a0a6500ec14f3380559614dbff162f199f817073533cf"
+        },
+        {
+          "bytes": 2719,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/State.lean",
+          "sha256": "42bbc3c03d3ec2a465166d8ec0a8a6331414c73d10449b53cc277c1f0d29b256"
+        },
+        {
+          "bytes": 7830,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/Completeness.lean",
+          "sha256": "e43d85579a6f6c7f66ed5327720a94902c44a73febf342d9883fad8ace460e48"
+        },
+        {
+          "bytes": 14745,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/LowDegreeGame.lean",
+          "sha256": "c80d4e1e776b7a34b25f9c4756f3dc61b3e337e24bc7b40b843745b228d6d617"
+        },
+        {
+          "bytes": 5564,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/LowDegreeGameMeasurements.lean",
+          "sha256": "204fbcf7a1d365f644c5dcfe1313187dc7f1d9ad997cb0a7a723ea61686d0293"
+        },
+        {
+          "bytes": 3609,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/MagicSquare.lean",
+          "sha256": "2417773bee2747d1daf3c5105fb16dc6574ab401b959527a957313d623b23672"
+        },
+        {
+          "bytes": 28526,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/PauliBasisTest.lean",
+          "sha256": "d8d7b2ffd328e6608d655b2423d0e87881b60845343eae1d42bd27b625534d8f"
+        },
+        {
+          "bytes": 6244,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/QubitForm.lean",
+          "sha256": "fd2d9daf0b4f894e408a3b61e449c7cc3b0100b199f1a7f81df918c83e69d2a6"
+        },
+        {
+          "bytes": 7593,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/QPBT/Test/SoundnessDefs.lean",
+          "sha256": "1f36a42d90be059357827ef3cc5a5040f447730afc228bbd9373d2b82242b389"
+        },
+        {
+          "bytes": 632,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/Quantum/FiniteMatrix/Basic.lean",
+          "sha256": "3775a9a7883338c16e1d5cdebe14516b0c08ded74b324b937d98e72235a47405"
+        },
+        {
+          "bytes": 932,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/Quantum/FiniteMatrix/NormalizedTrace.lean",
+          "sha256": "25e38be9b80252abc837aeb70dfcdd6c21167c0f1de810c061efb3826cc22220"
+        },
+        {
+          "bytes": 3460,
+          "kind": "file",
+          "path": "Challenge/MIPStarRE/Quantum/Measurement.lean",
+          "sha256": "a970d19fe483b5f439e3035101a00f8acedbc38cd03e340a72a56e353cae68f9"
+        },
+        {
+          "bytes": 13389,
+          "kind": "file",
+          "path": "Challenge.lean",
+          "sha256": "35d6ec1df8b3c66d9104ec1ee4d0b15a2bf39249f8fe085bb0c35725ab04c48c"
+        },
+        {
+          "bytes": 11358,
+          "kind": "file",
+          "path": "LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "bytes": 105,
+          "kind": "file",
+          "path": "QPBTComparator.lean",
+          "sha256": "213fa1e2c3156892d2d141bd558ba7b62a8e943a60cf1e207489b232a44f6c1d"
+        },
+        {
+          "bytes": 2717,
+          "kind": "file",
+          "path": "README.md",
+          "sha256": "ae9759b82b9db8579aefac74970874ec540180032eb6dcc84420fc85aa5f6465"
+        },
+        {
+          "bytes": 501,
+          "kind": "file",
+          "path": "Solution.lean",
+          "sha256": "5ace73ffa4cda9eb7ad5bf37d87cdfbb4ef733b54349916e0a4e81eb8f8d48d7"
+        },
+        {
+          "bytes": 386,
+          "kind": "file",
+          "path": "comparator.json",
+          "sha256": "09d4d92f98bef00ef093186992e80fae5f6c5a01800a9d3eaf4d599b0e76900d"
+        },
+        {
+          "bytes": 3650,
+          "kind": "file",
+          "path": "formalization.yaml",
+          "sha256": "573b61fec8e97be425d275eb4862eee39cb8b63165afe746c9099aa3bb9bb936"
+        },
+        {
+          "bytes": 3891,
+          "kind": "file",
+          "path": "lake-manifest.json",
+          "sha256": "aaa0c34a5bb61b0a32e1f7f822295713609075ed60f12dd3a1ada4a370a49636"
+        },
+        {
+          "bytes": 664,
+          "kind": "file",
+          "path": "lakefile.toml",
+          "sha256": "e207a84d0236f4019871c2d9993dfed6b95d8de459015f405631d0a541a33e3b"
+        },
+        {
+          "bytes": 25,
+          "kind": "file",
+          "path": "lean-toolchain",
+          "sha256": "2773c517aa90b66ea8a2c52bddddf84393157797f8341be0df45294fff7fd32e"
+        },
+        {
+          "bytes": 2006,
+          "kind": "file",
+          "path": "palomar-check.json",
+          "sha256": "31f3b77b421c2540a2451321579110810ce90ecd0a43a02689dafab1aa26c661"
+        },
+        {
+          "bytes": 2603,
+          "kind": "file",
+          "path": "tools/palomar/README.md",
+          "sha256": "bf4324f8c00067b2e1cc57eae9be6e7e5f28248fd8c001573928a8305be90d07"
+        },
+        {
+          "bytes": 41993,
+          "kind": "file",
+          "path": "tools/palomar/check.py",
+          "sha256": "c0e5d011799e3507c87d5566b3fbb8bb654e1c3844198471dc37f0db4c74456e"
+        },
+        {
+          "bytes": 5891,
+          "kind": "file",
+          "path": "tools/palomar/tests/test_check.py",
+          "sha256": "6a6512124c2db06889f62409dee134efc104ec7d1e58ce1491bfc4d8891c813e"
+        },
+        {
+          "bytes": 1686,
+          "kind": "file",
+          "path": "tools/palomar/upstream/browser-preflight-policy.json",
+          "sha256": "d3d0003b7a043695c5cb06c117253e248406e0723bbfe2cac50afb703fa97046"
+        },
+        {
+          "bytes": 12694,
+          "kind": "file",
+          "path": "tools/palomar/upstream/formalization-v0.4.schema.json",
+          "sha256": "25ff6b25ca4511635aff4443cf20480c15e59dddf19591c730950b442ea54fce"
+        },
+        {
+          "bytes": 54,
+          "kind": "file",
+          "path": "tools/palomar/upstream/toolchains.json",
+          "sha256": "fd40347e4b586e7c42233b35f11efb006d25033b9a7ded9565719edf7aa98354"
+        },
+        {
+          "bytes": 1962,
+          "kind": "file",
+          "path": "verify.sh",
+          "sha256": "de3959724718b719da979b467f364219c6ce6f47a98c98167eddedfb0bf7f9ec"
+        }
+      ],
+      "sha256": "ec79c1a2df758f3d0a1c5ef08db6aa38bf537a72185595dcb542c5265f1d83c3"
+    }
+  },
+  "overall": "fail",
+  "schema_version": 1
+}

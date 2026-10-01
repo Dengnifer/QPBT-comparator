@@ -1,0 +1,100 @@
+version: "v0.4"
+
+project:
+  name: "Quantum Pauli basis test"
+  description: >-
+    A Lean 4 formalization of the quantum Pauli basis test from MIP*=RE. The
+    registered results give a value-one symmetric projective consistent
+    commuting strategy, quantum soundness of the simultaneous low-degree
+    test, soundness of the Pauli basis test up to local isometries with the
+    explicit deltaQld error, and the corresponding qubit-coordinate form.
+  authors:
+    - "Ruixuan Deng"
+  responsible_maintainers:
+    - "Ruixuan Deng"
+  license: "Apache-2.0"
+
+repository:
+  role: "thin-wrapper"
+  substantive_formalization:
+    id: "Dengnifer/MIPStarRE-QPBT"
+    revision: "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+
+classification:
+  arxiv:
+    - "quant-ph"
+  msc2020: []
+
+sources:
+  - type: "article"
+    title: "MIP*=RE"
+    authors:
+      - "Zhengfeng Ji"
+      - "Anand Natarajan"
+      - "Thomas Vidick"
+      - "John Wright"
+      - "Henry Yuen"
+    id: "arXiv:2001.04383"
+    relationship: "formalizes"
+    location: >-
+      Section 4.7, including lem:ld-soundness, lem:pauli-completeness,
+      thm:pauli, and cor:pauli-binary; the analysis continues in Section 8.
+    author_endorsement: "not-contacted"
+
+status:
+  scope: >-
+    The comparator registers four headline declarations: completeness of the
+    Pauli basis test, soundness of the simultaneous low-degree test, Pauli
+    basis test soundness, and its qubit form.
+  main_results:
+    - name: "Pauli basis test completeness"
+      declaration: "MIPStarRE.QPBT.exists_spcc_value_one"
+      file: "MIPStarRE/QPBT/Test/Completeness.lean"
+      comparator_config: "comparator.json"
+    - name: "Simultaneous low-degree test soundness"
+      declaration: "MIPStarRE.QPBT.exists_ld_soundness"
+      file: "MIPStarRE/QPBT/Test/LowDegreeGameTheorems.lean"
+      comparator_config: "comparator.json"
+    - name: "Pauli basis test soundness"
+      declaration: "MIPStarRE.QPBT.pauli_soundness"
+      file: "MIPStarRE/QPBT/Test/Soundness.lean"
+      comparator_config: "comparator.json"
+    - name: "Qubit-coordinate Pauli soundness"
+      declaration: "MIPStarRE.QPBT.pauli_soundness_qubit"
+      file: "MIPStarRE/QPBT/Test/QubitForm.lean"
+      comparator_config: "comparator.json"
+  declarations:
+    - "MIPStarRE.QPBT.exists_spcc_value_one"
+    - "MIPStarRE.QPBT.exists_ld_soundness"
+    - "MIPStarRE.QPBT.pauli_soundness"
+    - "MIPStarRE.QPBT.pauli_soundness_qubit"
+
+alignment:
+  source_statement: "other"
+  translation_notes: >-
+    The four registered declarations retain the current comparator candidate's
+    parameter order, quantifier order, witnesses, and explicit deltaLd or
+    deltaQld error forms. The substantive repository documents proof-route and
+    printed-source corrections separately. This draft makes no independent
+    equivalence or faithfulness claim; comparator equality alone would not
+    establish one.
+
+automation:
+  methods:
+    - method: "agent"
+      framework: "MIPStarRE-dev local coding-agent workflow"
+      tool_setup: >-
+        AI coding agents edited Lean, documentation, and repository tooling;
+        deterministic local scripts, Lean, and the official comparator were
+        used for mechanical checks at recorded snapshots.
+  notes: >-
+    This work is AI-generated. Ruixuan Deng is the responsible owner and made
+    the recorded project decisions. No human review beyond those owner
+    decisions is claimed by this metadata draft.
+
+review:
+  status: "unchecked"
+  reviewers: []
+  notes: >-
+    No human mathematical or code review is claimed. Automated agent reviews
+    and historical comparator runs are not represented as human approval.
