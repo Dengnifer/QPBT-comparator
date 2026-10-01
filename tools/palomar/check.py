@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic, non-executing Palomar preparation checks."""
+"""Deterministic, non-executing Palomar preparation and report-content checks."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import subprocess
 import sys
 import tomllib
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 from urllib.parse import urlparse
 
@@ -28,10 +28,22 @@ except ImportError as error:  # pragma: no cover - exercised by the entry point
 
 FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 LICENSE_RE = re.compile(r"^(?:LICENSE|LICENCE|COPYING)(?:\..+)?$", re.IGNORECASE)
-LFS_HEADER = b"version https://git-lfs.github.com/spec/v1"
 COMMENT_MARKER = re.compile(r"/-|-/")
 RUNTIME_PARTS = {".git", ".lake", "__pycache__"}
-COMPILED_SUFFIXES = {".olean", ".ilean", ".c", ".o", ".so", ".dll", ".dylib"}
+COMPILED_SUFFIXES = {
+    ".a",
+    ".bc",
+    ".dll",
+    ".dylib",
+    ".ilean",
+    ".ir",
+    ".o",
+    ".obj",
+    ".olean",
+    ".so",
+    ".trace",
+}
+COMPILED_NAME_SUFFIXES = (".olean.private", ".olean.server")
 
 # Lean identifier boundaries used by PalomarSubmission's cheap module-header
 # preflight. Lean itself remains the authoritative parser in the official run.
@@ -43,6 +55,8 @@ ID_LETTER_LIKE = (
 ID_FIRST = rf"A-Za-z_{ID_LETTER_LIKE}"
 ID_REST = rf"{ID_FIRST}0-9'!?\u2080-\u2089\u2090-\u209c\u1d62-\u1d6a\u2c7c"
 IDENTIFIER_CONTINUATION = re.compile(rf"[{ID_REST}]|\.[{ID_FIRST}«]")
+NAME_COMPONENT = rf"(?:[{ID_FIRST}][{ID_REST}]*|0|[1-9][0-9]*)"
+EXPORT_TARGET = re.compile(rf"^{NAME_COMPONENT}(?:\.{NAME_COMPONENT})*$")
 
 
 @dataclass
@@ -81,11 +95,27 @@ def sha256_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"{path} must contain a JSON object")
+def unique_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    duplicates: set[str] = set()
+    for key, item in pairs:
+        if key in value:
+            duplicates.add(key)
+        value[key] = item
+    if duplicates:
+        raise ValueError(f"duplicate JSON keys: {', '.join(sorted(duplicates))}")
     return value
+
+
+def parse_json_object(text: str, label: str) -> dict[str, Any]:
+    value = json.loads(text, object_pairs_hook=unique_json_object)
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must contain a JSON object")
+    return value
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    return parse_json_object(path.read_text(encoding="utf-8"), str(path))
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -232,6 +262,74 @@ def normalize_repository_id(value: str) -> str:
     return value[:-4] if value.endswith(".git") else value
 
 
+def normalize_repository_path(value: object) -> str | None:
+    if value is None or value == "":
+        return "."
+    if not isinstance(value, str) or "\\" in value:
+        return None
+    raw = PurePosixPath(value)
+    if raw.is_absolute() or ".." in raw.parts:
+        return None
+    normalized = raw.as_posix()
+    return "." if normalized in {"", "."} else normalized
+
+
+def valid_export_target_name(value: object) -> bool:
+    return isinstance(value, str) and EXPORT_TARGET.fullmatch(value) is not None
+
+
+def exact_declaration_list(value: object, expected: Iterable[str]) -> bool:
+    expected_names = list(expected)
+    return bool(
+        isinstance(value, list)
+        and all(valid_export_target_name(item) for item in value)
+        and len(value) == len(set(value))
+        and len(expected_names) == len(set(expected_names))
+        and all(valid_export_target_name(item) for item in expected_names)
+        and set(value) == set(expected_names)
+    )
+
+
+def is_compiled_artifact(path: Path) -> bool:
+    lowered = path.name.lower()
+    return (
+        path.suffix.lower() in COMPILED_SUFFIXES
+        or lowered.endswith(COMPILED_NAME_SUFFIXES)
+    )
+
+
+def regular_file_within_limit(path: Path, limit: int) -> tuple[bool, int | None]:
+    if path.is_symlink() or not path.is_file():
+        return False, None
+    size = path.stat().st_size
+    return size <= limit, size
+
+
+def tracked_lfs_paths(root: Path) -> list[str]:
+    tracked = run_git(root, "ls-files", "-z")
+    if tracked.returncode != 0:
+        raise ValueError(tracked.stderr.decode("utf-8", "replace").strip())
+    if not tracked.stdout:
+        return []
+    attributes = run_git(
+        root, "check-attr", "--cached", "-z", "filter", "--stdin",
+        input_bytes=tracked.stdout,
+    )
+    if attributes.returncode != 0:
+        raise ValueError(attributes.stderr.decode("utf-8", "replace").strip())
+    fields = attributes.stdout.split(b"\0")
+    if fields and fields[-1] == b"":
+        fields.pop()
+    if len(fields) % 3:
+        raise ValueError("git check-attr returned malformed output")
+    lfs: list[str] = []
+    for position in range(0, len(fields), 3):
+        path, attribute, value = fields[position:position + 3]
+        if attribute == b"filter" and value == b"lfs":
+            lfs.append(path.decode("utf-8"))
+    return sorted(lfs)
+
+
 def parse_version(value: str) -> tuple[int, int, int, int]:
     match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)(?:-rc(\d+))?", value)
     if not match:
@@ -359,21 +457,120 @@ def inspect_substantive(repo: Path, revision: str, line_cap: int, module_exempt:
     return scan
 
 
-def authoritative_report_check(
+def substantive_main_pin_check(repo: Path, revision: str, canonical: str) -> Check:
+    commit = run_git(repo, "cat-file", "-e", f"{revision}^{{commit}}")
+    if commit.returncode != 0:
+        return Check(
+            "substantive.pin_on_main", "unknown", "static",
+            "the pinned substantive commit is unavailable, so main ancestry cannot be checked",
+            {"revision": revision, "canonical_repository": canonical},
+        )
+    remotes = run_git(repo, "remote")
+    if remotes.returncode != 0:
+        return Check(
+            "substantive.pin_on_main", "unknown", "static",
+            "Git remotes are unavailable, so canonical repository identity cannot be checked",
+            {"revision": revision, "canonical_repository": canonical},
+        )
+
+    canonical_remotes: list[tuple[str, str]] = []
+    for remote in remotes.stdout.decode("utf-8", "replace").splitlines():
+        url = run_git(repo, "remote", "get-url", remote)
+        if url.returncode != 0:
+            continue
+        value = url.stdout.decode("utf-8", "replace").strip()
+        if normalize_repository_id(value) == canonical:
+            canonical_remotes.append((remote, value))
+    if not canonical_remotes:
+        return Check(
+            "substantive.pin_on_main", "unknown", "static",
+            "no local Git remote identifies the canonical substantive repository",
+            {"revision": revision, "canonical_repository": canonical},
+        )
+
+    observed: list[dict[str, Any]] = []
+    for remote, url in canonical_remotes:
+        main_ref = f"refs/remotes/{remote}/main"
+        main = run_git(repo, "rev-parse", "--verify", f"{main_ref}^{{commit}}")
+        if main.returncode != 0:
+            observed.append({"remote": remote, "url": url, "main_ref": main_ref, "observed": False})
+            continue
+        main_commit = main.stdout.decode("ascii").strip()
+        ancestry = run_git(repo, "merge-base", "--is-ancestor", revision, main_ref)
+        if ancestry.returncode == 0:
+            return Check(
+                "substantive.pin_on_main", "pass", "static",
+                "the substantive pin is an ancestor of the observed canonical main",
+                {
+                    "revision": revision,
+                    "canonical_repository": canonical,
+                    "remote": remote,
+                    "remote_url": url,
+                    "main_ref": main_ref,
+                    "main_commit": main_commit,
+                },
+            )
+        observed.append(
+            {
+                "remote": remote,
+                "url": url,
+                "main_ref": main_ref,
+                "main_commit": main_commit,
+                "observed": True,
+                "is_ancestor": False if ancestry.returncode == 1 else None,
+            }
+        )
+
+    if any(item.get("is_ancestor") is False for item in observed):
+        return Check(
+            "substantive.pin_on_main", "fail", "static",
+            "the substantive pin is not an ancestor of the observed canonical main",
+            {"revision": revision, "canonical_repository": canonical, "observations": observed},
+        )
+    return Check(
+        "substantive.pin_on_main", "unknown", "static",
+        "the canonical remote is known but no canonical main commit is locally observed",
+        {"revision": revision, "canonical_repository": canonical, "observations": observed},
+    )
+
+
+def official_report_checks(
     root: Path, report_path: Path | None, config: dict[str, Any],
     expected_axioms: set[str],
-) -> Check:
-    required_kernels = {"nanoda", "con-ron"}
+) -> list[Check]:
+    required_kernels = set(config.get("expected_kernel_names", ["nanoda", "con-ron"]))
+    required_repositories = set(
+        config.get("expected_challenge_repositories", ["leanprover-community/mathlib4"])
+    )
+    content_note = (
+        "This validates supplied JSON content only. The existing companion-review lane "
+        "must authenticate artifact origin, workflow revision, run, attempt, and job."
+    )
     if report_path is None:
-        return Check(
-            "proof.authoritative_comparator", "unknown", "authoritative",
-            "no official final-snapshot Palomar/comparator report is attached; proof, axiom, and independent-kernel claims are not certified here",
-            {
-                "required_targets": config["expected_theorems"],
-                "required_axioms": sorted(expected_axioms),
-                "required_kernels": ["Lean kernel", "leanchecker", "NanoDa", "con-ron"],
-            },
-        )
+        common = {
+            "required_theorems": config["expected_theorems"],
+            "required_definitions": config["expected_definitions"],
+            "required_axioms": sorted(expected_axioms),
+            "required_kernels": sorted(required_kernels),
+            "note": content_note,
+        }
+        return [
+            Check(
+                "proof.report_content", "unknown", "report-content",
+                "no full verification report is attached for content validation",
+                common,
+            ),
+            Check(
+                "repository.public_source", "unknown", "report-content",
+                "public-source verification is delegated to the authenticated Palomar run",
+                {"expected_repository": config["wrapper_repository"], "note": content_note},
+            ),
+            Check(
+                "challenge.actual_import_origin", "unknown", "report-content",
+                "resolved transitive Challenge origins require the full Palomar report",
+                {"expected_repositories": sorted(required_repositories), "note": content_note},
+            ),
+        ]
     try:
         official = load_json(report_path)
         head_proc = run_git(root, "rev-parse", "HEAD")
@@ -385,42 +582,262 @@ def authoritative_report_check(
             raise ValueError("current Git status is unavailable")
         source = official.get("source", {})
         comparator = official.get("comparator", {})
-        kernels = comparator.get("external_kernels", {})
+        challenge = official.get("challenge", {})
+        solution = official.get("solution", {})
+        submission = official.get("submission", {})
+        if not all(
+            isinstance(item, dict)
+            for item in (source, comparator, challenge, solution, submission)
+        ):
+            raise ValueError("report source, submission, comparator, Challenge, and Solution must be objects")
+
         errors: list[str] = []
+        if official.get("schema_version") != 2:
+            errors.append("full verification report schema_version must be 2")
         if official.get("status") != "pass" or official.get("stage") != "complete":
-            errors.append("official report is not a completed pass")
+            errors.append("report content is not a completed pass")
         if official.get("phase") != "verification":
-            errors.append("official report is not a verification-phase report")
+            errors.append("report content is not verification phase")
+        if official.get("errors") != []:
+            errors.append("completed pass report must contain an empty errors list")
         if normalize_repository_id(str(source.get("repository", ""))) != config["wrapper_repository"]:
-            errors.append("official report names a different wrapper repository")
+            errors.append("report names a different wrapper repository")
         if source.get("commit") != head:
-            errors.append("official report is not bound to the current Git head")
+            errors.append("report is not bound to the current Git head")
         if status_proc.stdout:
             errors.append("worktree is not clean at the reported Git head")
+
+        expected_project = normalize_repository_path(config.get("project_path", "."))
+        requested = submission.get("requested_paths", {})
+        if not isinstance(requested, dict):
+            errors.append("submission.requested_paths must be an object")
+            requested = {}
+        selected_paths = {
+            "project_path": expected_project,
+            "comparator_config_path": normalize_repository_path(config["comparator_config_path"]),
+            "formalization_metadata_path": normalize_repository_path(config["metadata_path"]),
+        }
+        for key, expected in selected_paths.items():
+            if normalize_repository_path(requested.get(key)) != expected:
+                errors.append(f"requested {key} does not match the selected local path")
+        if normalize_repository_path(source.get("project_path")) != expected_project:
+            errors.append("source.project_path does not match the selected project")
+
+        local_comparator = load_json(root / config["comparator_config_path"])
+        expected_modules = {
+            "challenge_module": local_comparator.get("challenge_module"),
+            "solution_module": local_comparator.get("solution_module"),
+        }
+        for key, expected in expected_modules.items():
+            if comparator.get(key) != expected:
+                errors.append(f"report comparator {key} differs from the local configuration")
         theorem_names = comparator.get("theorem_names", [])
-        if not isinstance(theorem_names, list) or set(theorem_names) != set(config["expected_theorems"]):
-            errors.append("official report does not cover exactly the four expected declarations")
+        if not exact_declaration_list(theorem_names, config["expected_theorems"]):
+            errors.append("report does not contain the exact duplicate-free theorem list")
+        definition_names = comparator.get("definition_names", [])
+        if not exact_declaration_list(definition_names, config["expected_definitions"]):
+            errors.append("report does not contain the exact duplicate-free definition list")
         axioms = comparator.get("permitted_axioms", [])
-        if not isinstance(axioms, list) or set(axioms) != expected_axioms:
-            errors.append("official report does not use exactly the standard axiom set")
-        if not isinstance(kernels, dict) or not required_kernels <= set(kernels):
-            errors.append("official report does not record protected nanoda and con-ron kernels")
-        return Check(
-            "proof.authoritative_comparator", "pass" if not errors else "fail", "authoritative",
-            "official final-snapshot verification passed with the expected declarations, axioms, and kernels" if not errors else "official report is present but does not match the required final-snapshot evidence",
-            {
-                "report_sha256": sha256_file(report_path),
-                "source_commit": source.get("commit"),
-                "workflow_url": official.get("workflow_url"),
-                "errors": errors,
-            },
-        )
+        if not exact_declaration_list(axioms, expected_axioms):
+            errors.append("report does not contain exactly the three standard axioms")
+
+        def check_file_record(label: str, record: object, expected_path: str) -> None:
+            if not isinstance(record, dict):
+                errors.append(f"{label} must be an object")
+                return
+            if normalize_repository_path(record.get("path")) != normalize_repository_path(expected_path):
+                errors.append(f"{label}.path does not match {expected_path}")
+            local_path = root / expected_path
+            if not local_path.is_file() or record.get("sha256") != sha256_file(local_path):
+                errors.append(f"{label}.sha256 does not match the selected local file")
+
+        check_file_record("formalization", official.get("formalization"), config["metadata_path"])
+        check_file_record("comparator", comparator, config["comparator_config_path"])
+        check_file_record("lakefile", official.get("lakefile"), "lakefile.toml")
+        check_file_record("lake_manifest", official.get("lake_manifest"), "lake-manifest.json")
+        if normalize_repository_path(official.get("lean_toolchain_path")) != "lean-toolchain":
+            errors.append("lean_toolchain_path does not select lean-toolchain")
+
+        challenge_module = str(expected_modules["challenge_module"] or "")
+        solution_module = str(expected_modules["solution_module"] or "")
+        if challenge.get("module") != challenge_module:
+            errors.append("Challenge module does not match the selected comparator module")
+        if solution.get("module") != solution_module:
+            errors.append("Solution module does not match the selected comparator module")
+        check_file_record("challenge", challenge, module_path(challenge_module).as_posix())
+        check_file_record("solution", solution, module_path(solution_module).as_posix())
+
+        kernel_map: dict[str, list[str]] = {}
+        kernels = official.get("kernels")
+        if not isinstance(kernels, list):
+            errors.append("top-level kernels must be a list")
+        else:
+            for item in kernels:
+                if not isinstance(item, dict) or set(item) != {"name", "argv"}:
+                    errors.append("each kernel record must contain exactly name and argv")
+                    continue
+                name = item.get("name")
+                argv = item.get("argv")
+                if not isinstance(name, str) or not name or name in kernel_map:
+                    errors.append("kernel names must be nonempty and duplicate-free")
+                    continue
+                if (
+                    not isinstance(argv, list)
+                    or not argv
+                    or not all(isinstance(part, str) and part for part in argv)
+                    or not Path(argv[0]).is_absolute()
+                ):
+                    errors.append(f"kernel {name!r} has an invalid command array")
+                    continue
+                kernel_map[name] = argv
+            if set(kernel_map) != required_kernels:
+                errors.append("top-level kernels do not name exactly nanoda and con-ron")
+
+        protected_text = official.get("protected_config")
+        protected: dict[str, Any] | None = None
+        if not isinstance(protected_text, str):
+            errors.append("protected_config must contain the exact JSON text used by the verifier")
+        else:
+            if sha256_bytes(protected_text.encode("utf-8")) != official.get("protected_config_sha256"):
+                errors.append("protected_config_sha256 does not match protected_config bytes")
+            try:
+                protected = parse_json_object(protected_text, "protected_config")
+            except Exception as error:
+                errors.append(f"protected_config is malformed: {error}")
+        protected_keys = {
+            "challenge_module", "solution_module", "theorem_names", "definition_names",
+            "permitted_axioms", "external_kernels",
+        }
+        if protected is not None and set(protected) != protected_keys:
+            errors.append("protected_config has the wrong keys")
+        if protected is not None:
+            if re.fullmatch(
+                r"PalomarCanonical[0-9a-f]{24}\.Challenge",
+                str(protected.get("challenge_module", "")),
+            ) is None:
+                errors.append("protected_config has no verifier-owned Challenge alias")
+            if protected.get("solution_module") != solution_module:
+                errors.append("protected_config selects a different Solution module")
+            if not exact_declaration_list(
+                protected.get("theorem_names"), config["expected_theorems"]
+            ):
+                errors.append("protected_config theorem names differ from the profile")
+            if not exact_declaration_list(
+                protected.get("definition_names"), config["expected_definitions"]
+            ):
+                errors.append("protected_config definition names differ from the profile")
+            if not exact_declaration_list(protected.get("permitted_axioms"), expected_axioms):
+                errors.append("protected_config does not contain exactly the standard axioms")
+            if protected.get("external_kernels") != kernel_map:
+                errors.append("protected_config kernel commands differ from top-level kernels")
+
+        public_errors: list[str] = []
+        repository_url = str(source.get("repository_url", ""))
+        parsed_repository_url = urlparse(repository_url)
+        if not (
+            parsed_repository_url.scheme == "https"
+            and parsed_repository_url.netloc.casefold() == "github.com"
+            and normalize_repository_id(repository_url) == config["wrapper_repository"]
+        ):
+            public_errors.append("report source is not the selected canonical GitHub repository URL")
+
+        challenge_errors: list[str] = []
+        dependencies = challenge.get("dependencies")
+        dependency_repositories: list[str] = []
+        if not isinstance(dependencies, list):
+            challenge_errors.append("Challenge dependency provenance is missing")
+        else:
+            for item in dependencies:
+                if (
+                    not isinstance(item, dict)
+                    or set(item) != {"repository", "provenance"}
+                    or item.get("provenance") != "allowlisted"
+                    or not isinstance(item.get("repository"), str)
+                ):
+                    challenge_errors.append("Challenge dependency provenance is malformed")
+                    continue
+                dependency_repositories.append(normalize_repository_id(item["repository"]))
+            if (
+                len(dependency_repositories) != len(set(dependency_repositories))
+                or set(dependency_repositories) != required_repositories
+            ):
+                challenge_errors.append("Challenge dependencies are not exactly the Mathlib profile")
+        if challenge.get("untrusted_sources") != []:
+            challenge_errors.append("Challenge report records untrusted transitive sources")
+        if challenge.get("trust_level") != "high":
+            challenge_errors.append("Challenge trust level is not the high Mathlib-only level")
+        source_count = challenge.get("transitive_source_count")
+        if not isinstance(source_count, int) or isinstance(source_count, bool) or source_count < 1:
+            challenge_errors.append("Challenge transitive source count is missing or invalid")
+        direct_imports = challenge.get("direct_imports")
+        trusted_prefixes = set(config["trusted_challenge_prefixes"])
+        if not (
+            isinstance(direct_imports, list)
+            and bool(direct_imports)
+            and all(
+                isinstance(name, str) and name.split(".", 1)[0] in trusted_prefixes
+                for name in direct_imports
+            )
+        ):
+            challenge_errors.append("Challenge direct imports exceed the selected static root profile")
+
+        report_details = {
+            "report_sha256": sha256_file(report_path),
+            "source_commit": source.get("commit"),
+            "workflow_url": official.get("workflow_url"),
+            "errors": errors,
+            "note": content_note,
+        }
+        return [
+            Check(
+                "proof.report_content", "pass" if not errors else "fail", "report-content",
+                (
+                    "supplied report content matches the final-head declaration, axiom, protected-config, and kernel contract"
+                    if not errors
+                    else "supplied report content does not match the final-head verification contract"
+                ),
+                report_details,
+            ),
+            Check(
+                "repository.public_source", "pass" if not public_errors else "fail", "report-content",
+                (
+                    "supplied report content records the selected canonical GitHub source"
+                    if not public_errors
+                    else "supplied report content does not record the selected canonical GitHub source"
+                ),
+                {"repository_url": repository_url, "errors": public_errors, "note": content_note},
+            ),
+            Check(
+                "challenge.actual_import_origin", "pass" if not challenge_errors else "fail",
+                "report-content",
+                (
+                    "supplied report content records a resolved Mathlib-only transitive Challenge"
+                    if not challenge_errors
+                    else "supplied report content does not record the required resolved Challenge origins"
+                ),
+                {
+                    "repositories": dependency_repositories,
+                    "errors": challenge_errors,
+                    "note": content_note,
+                },
+            ),
+        ]
     except Exception as error:
-        return Check(
-            "proof.authoritative_comparator", "fail", "authoritative",
-            f"official report could not be validated: {error}",
-            {"report": str(report_path)},
-        )
+        detail = {"report": str(report_path), "error": str(error), "note": content_note}
+        return [
+            Check(
+                "proof.report_content", "fail", "report-content",
+                "supplied report content could not be validated", detail,
+            ),
+            Check(
+                "repository.public_source", "fail", "report-content",
+                "public-source report content could not be validated", detail,
+            ),
+            Check(
+                "challenge.actual_import_origin", "fail", "report-content",
+                "Challenge-origin report content could not be validated", detail,
+            ),
+        ]
 
 
 def metadata_checks(
@@ -474,6 +891,26 @@ def metadata_checks(
             semantic.append(f"automation.notes must include disclosure {disclosure!r}")
     if metadata.get("review", {}).get("status") != "unchecked":
         semantic.append("review.status must remain unchecked until a review is actually recorded")
+    status = metadata.get("status", {})
+    main_results = status.get("main_results", []) if isinstance(status, dict) else []
+    main_declarations = (
+        [item.get("declaration") for item in main_results if isinstance(item, dict)]
+        if isinstance(main_results, list)
+        else []
+    )
+    if (
+        not isinstance(main_results, list)
+        or len(main_declarations) != len(main_results)
+        or not exact_declaration_list(main_declarations, config["expected_theorems"])
+    ):
+        semantic.append(
+            "status.main_results declarations must be the exact duplicate-free Palomar theorem list"
+        )
+    declared_results = status.get("declarations", []) if isinstance(status, dict) else []
+    if not exact_declaration_list(declared_results, config["expected_theorems"]):
+        semantic.append(
+            "status.declarations must be the exact duplicate-free Palomar theorem list"
+        )
     add(
         checks, "metadata.palomar_minimum", "pass" if not semantic else "fail", "static",
         "metadata satisfies the selected Palomar semantic minimum" if not semantic else "metadata misses selected Palomar requirements",
@@ -548,14 +985,10 @@ def run_checks(
     )
 
     total_bytes = sum(path.lstat().st_size for path in files if path.exists())
-    lfs = []
     compiled = []
     for path in files:
         if path.is_file() and not path.is_symlink():
-            data = path.read_bytes()
-            if data.startswith(LFS_HEADER):
-                lfs.append(path.relative_to(root).as_posix())
-            if path.suffix in COMPILED_SUFFIXES:
+            if is_compiled_artifact(path):
                 compiled.append(path.relative_to(root).as_posix())
     submodules: list[str] = []
     staged = run_git(root, "ls-files", "--stage", "-z")
@@ -563,13 +996,30 @@ def run_checks(
         for entry in staged.stdout.split(b"\0"):
             if entry.startswith(b"160000 "):
                 submodules.append(entry.split(b"\t", 1)[1].decode("utf-8"))
-    repository_ok = total_bytes <= policy["limits"]["source_bytes"] and not lfs and not compiled and not submodules
+    repository_ok = total_bytes <= policy["limits"]["source_bytes"] and not compiled and not submodules
     add(
         checks, "repository.integrity", "pass" if repository_ok else "fail", "static",
         "repository source snapshot meets static integrity limits" if repository_ok else "repository source snapshot has prohibited content",
-        bytes=total_bytes, byte_limit=policy["limits"]["source_bytes"], lfs_pointers=lfs,
+        bytes=total_bytes, byte_limit=policy["limits"]["source_bytes"],
         compiled_artifacts=compiled, submodules=submodules,
     )
+    try:
+        lfs_paths = tracked_lfs_paths(root)
+        add(
+            checks, "repository.git_lfs", "pass" if not lfs_paths else "fail", "static",
+            (
+                "no tracked path has the cached Git attribute filter=lfs"
+                if not lfs_paths
+                else "tracked paths use Git LFS and are not preservable in an ordinary fork"
+            ),
+            tracked_lfs_paths=lfs_paths,
+            note="This mirrors Palomar's git check-attr --cached check and does not ban harmless file contents.",
+        )
+    except Exception as error:
+        add(
+            checks, "repository.git_lfs", "fail", "static",
+            f"cached Git LFS attributes could not be inspected: {error}",
+        )
 
     metadata = metadata_checks(root, config, policy, schema, checks)
     module_exempt = set(policy["lean_sources"]["module_exempt_filenames"])
@@ -657,25 +1107,53 @@ def run_checks(
         candidates=license_candidates, recognized=recognized, metadata=metadata_license,
     )
 
-    comparator = load_json(root / config["comparator_config_path"])
+    comparator_path = root / config["comparator_config_path"]
+    comparator_limit = policy["limits"]["configuration_bytes"]
+    comparator_size_ok, comparator_size = regular_file_within_limit(
+        comparator_path, comparator_limit
+    )
+    add(
+        checks, "comparator.size", "pass" if comparator_size_ok else "fail", "static",
+        (
+            f"Comparator configuration is {comparator_size} bytes (limit {comparator_limit})"
+            if comparator_size is not None
+            else "Comparator configuration is not a regular file"
+        ),
+        bytes=comparator_size, limit=comparator_limit,
+    )
+    comparator_error = None
+    try:
+        comparator = load_json(comparator_path)
+    except Exception as error:
+        comparator = {}
+        comparator_error = str(error)
     required_keys = set(policy["comparator"]["required_keys"])
     allowed_keys = set(policy["comparator"]["allowed_keys"])
     key_ok = required_keys <= comparator.keys() <= allowed_keys
     theorem_names = comparator.get("theorem_names", [])
-    declarations_ok = (
-        isinstance(theorem_names, list) and len(theorem_names) == len(set(theorem_names))
-        and set(theorem_names) == set(config["expected_theorems"])
+    theorems_ok = exact_declaration_list(theorem_names, config["expected_theorems"])
+    definition_names = comparator.get("definition_names", [])
+    definitions_ok = exact_declaration_list(
+        definition_names, config["expected_definitions"]
     )
     expected_axioms = set(policy["comparator"]["standard_axioms"])
     axioms = comparator.get("permitted_axioms", [])
-    axioms_ok = isinstance(axioms, list) and set(axioms) == expected_axioms and len(axioms) == len(expected_axioms)
+    axioms_ok = exact_declaration_list(axioms, expected_axioms)
     nanoda_ok = comparator.get("enable_nanoda") is True
-    comparator_ok = key_ok and declarations_ok and axioms_ok and nanoda_ok
+    comparator_ok = bool(
+        comparator_size_ok and comparator_error is None and key_ok and theorems_ok
+        and definitions_ok and axioms_ok and nanoda_ok
+    )
     add(
         checks, "comparator.configuration", "pass" if comparator_ok else "fail", "static",
-        "comparator config names the four targets, only standard axioms, and NanoDa" if comparator_ok else "comparator config differs from the selected Palomar profile",
+        (
+            "Comparator config names the exact theorem and definition frontiers and three standard axioms"
+            if comparator_ok
+            else "Comparator config differs from the selected Palomar declaration profile"
+        ),
         required_keys=sorted(required_keys), actual_keys=sorted(comparator), theorem_names=theorem_names,
-        permitted_axioms=axioms, enable_nanoda=comparator.get("enable_nanoda"),
+        definition_names=definition_names, permitted_axioms=axioms,
+        enable_nanoda=comparator.get("enable_nanoda"), parse_error=comparator_error,
         note="Palomar's official verifier injects protected NanoDa and con-ron commands; this field is compatibility data, not kernel evidence.",
     )
 
@@ -735,14 +1213,27 @@ def run_checks(
     import_ok = not local_dependencies and not unknown_imports
     add(
         checks, "challenge.static_import_boundary", "pass" if import_ok else "fail", "static",
-        "Challenge directly imports only trusted dependency roots" if import_ok else "Challenge reaches local or untrusted source modules",
+        (
+            "Challenge import spellings use only profile-approved roots"
+            if import_ok
+            else "Challenge reaches local modules or import spellings outside the profile"
+        ),
         local_dependencies=sorted(local_dependencies)[:100], unknown_imports=sorted(unknown_imports),
         trusted_imports=sorted(trusted_imports), local_closure_files=len(closure_paths),
         local_closure_lines=closure_lines, local_closure_bytes=closure_bytes,
+        note=(
+            "This static check proves only direct name-prefix and local-file facts. "
+            "It does not resolve module origins or inspect transitive imports."
+        ),
     )
 
     substantive_evidence: dict[str, Any] | None = None
     if substantive_repo is None:
+        add(
+            checks, "substantive.pin_on_main", "unknown", "static",
+            "no local substantive repository was supplied for canonical-main ancestry",
+            expected_revision=dependency_revision, canonical_repository=canonical,
+        )
         add(
             checks, "source.substantive_requirements", "unknown", "static",
             "no local substantive repository was supplied for the pinned-revision source scan",
@@ -753,6 +1244,11 @@ def run_checks(
             "the substantive toolchain and Mathlib revision were not inspected",
         )
     else:
+        checks.append(
+            substantive_main_pin_check(
+                substantive_repo.resolve(), dependency_revision, canonical
+            )
+        )
         try:
             substantive_evidence = inspect_substantive(
                 substantive_repo.resolve(), dependency_revision,
@@ -818,7 +1314,7 @@ def run_checks(
         "lexical scans are recorded but cannot certify proof completion or axiom closure",
         **lexical_details,
     )
-    checks.append(authoritative_report_check(root, official_report, config, expected_axioms))
+    checks.extend(official_report_checks(root, official_report, config, expected_axioms))
 
     statuses = {check.status for check in checks}
     overall = "fail" if "fail" in statuses else "unknown" if "unknown" in statuses else "pass"
@@ -829,7 +1325,10 @@ def run_checks(
         "evidence_model": {
             "schema": "validation against a byte-pinned public schema",
             "static": "non-executing source/configuration inspection",
-            "authoritative": "kernel/comparator evidence from an official final-snapshot run",
+            "report-content": (
+                "structural and exact-head checks on supplied report JSON; artifact provenance "
+                "is authenticated separately by the companion-review lane"
+            ),
         },
         "inputs": {
             "wrapper": input_manifest(root, excluded),

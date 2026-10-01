@@ -8,18 +8,26 @@
   "substantive_dependency_name": "MIPStarRE",
   "canonical_substantive_repository": "Dengnifer/MIPStarRE-QPBT",
   "expected_theorems": [
-    "MIPStarRE.QPBT.pauli_soundness",
-    "MIPStarRE.QPBT.pauli_soundness_qubit",
-    "MIPStarRE.QPBT.exists_spcc_value_one",
-    "MIPStarRE.QPBT.exists_ld_soundness"
+    "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
+    "MIPStarRE.QPBT.Palomar.exists_ld_soundness",
+    "MIPStarRE.QPBT.Palomar.pauli_soundness",
+    "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
+  ],
+  "expected_definitions": [
+    "MIPStarRE.QPBT.fixedFieldModel"
+  ],
+  "expected_kernel_names": [
+    "nanoda",
+    "con-ron"
+  ],
+  "expected_challenge_repositories": [
+    "leanprover-community/mathlib4"
   ],
   "trusted_challenge_prefixes": [
     "Init",
     "Lean",
     "Std",
-    "Mathlib",
-    "TauCeti",
-    "CSLib"
+    "Mathlib"
   ],
   "challenge_limits": {
     "lines": 1000,

@@ -25,9 +25,8 @@
     {
       "details": {
         "byte_limit": 524288000,
-        "bytes": 277969,
+        "bytes": 314610,
         "compiled_artifacts": [],
-        "lfs_pointers": [],
         "submodules": []
       },
       "evidence": "static",
@@ -37,13 +36,23 @@
     },
     {
       "details": {
-        "bytes": 3650,
+        "note": "This mirrors Palomar's git check-attr --cached check and does not ban harmless file contents.",
+        "tracked_lfs_paths": []
+      },
+      "evidence": "static",
+      "id": "repository.git_lfs",
+      "status": "pass",
+      "summary": "no tracked path has the cached Git attribute filter=lfs"
+    },
+    {
+      "details": {
+        "bytes": 3714,
         "limit": 262144
       },
       "evidence": "static",
       "id": "metadata.size",
       "status": "pass",
-      "summary": "metadata is 3650 bytes (limit 262144)"
+      "summary": "metadata is 3714 bytes (limit 262144)"
     },
     {
       "details": {
@@ -196,6 +205,16 @@
     },
     {
       "details": {
+        "bytes": 386,
+        "limit": 1048576
+      },
+      "evidence": "static",
+      "id": "comparator.size",
+      "status": "pass",
+      "summary": "Comparator configuration is 386 bytes (limit 1048576)"
+    },
+    {
+      "details": {
         "actual_keys": [
           "challenge_module",
           "enable_nanoda",
@@ -203,8 +222,10 @@
           "solution_module",
           "theorem_names"
         ],
+        "definition_names": [],
         "enable_nanoda": true,
         "note": "Palomar's official verifier injects protected NanoDa and con-ron commands; this field is compatibility data, not kernel evidence.",
+        "parse_error": null,
         "permitted_axioms": [
           "propext",
           "Quot.sound",
@@ -225,8 +246,8 @@
       },
       "evidence": "static",
       "id": "comparator.configuration",
-      "status": "pass",
-      "summary": "comparator config names the four targets, only standard axioms, and NanoDa"
+      "status": "fail",
+      "summary": "Comparator config differs from the selected Palomar declaration profile"
     },
     {
       "details": {
@@ -287,6 +308,7 @@
           "Challenge.MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace",
           "Challenge.MIPStarRE.Quantum.Measurement"
         ],
+        "note": "This static check proves only direct name-prefix and local-file facts. It does not resolve module origins or inspect transitive imports.",
         "trusted_imports": [
           "Mathlib"
         ],
@@ -295,7 +317,21 @@
       "evidence": "static",
       "id": "challenge.static_import_boundary",
       "status": "fail",
-      "summary": "Challenge reaches local or untrusted source modules"
+      "summary": "Challenge reaches local modules or import spellings outside the profile"
+    },
+    {
+      "details": {
+        "canonical_repository": "Dengnifer/MIPStarRE-QPBT",
+        "main_commit": "15767da684dd6a48c100ce92997033402fdcb228",
+        "main_ref": "refs/remotes/github/main",
+        "remote": "github",
+        "remote_url": "git@github.com:Dengnifer/MIPStarRE-QPBT.git",
+        "revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+      },
+      "evidence": "static",
+      "id": "substantive.pin_on_main",
+      "status": "pass",
+      "summary": "the substantive pin is an ancestor of the observed canonical main"
     },
     {
       "details": {
@@ -584,32 +620,56 @@
     },
     {
       "details": {
+        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job.",
         "required_axioms": [
           "Classical.choice",
           "Quot.sound",
           "propext"
         ],
-        "required_kernels": [
-          "Lean kernel",
-          "leanchecker",
-          "NanoDa",
-          "con-ron"
+        "required_definitions": [
+          "MIPStarRE.QPBT.fixedFieldModel"
         ],
-        "required_targets": [
-          "MIPStarRE.QPBT.pauli_soundness",
-          "MIPStarRE.QPBT.pauli_soundness_qubit",
-          "MIPStarRE.QPBT.exists_spcc_value_one",
-          "MIPStarRE.QPBT.exists_ld_soundness"
+        "required_kernels": [
+          "con-ron",
+          "nanoda"
+        ],
+        "required_theorems": [
+          "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
+          "MIPStarRE.QPBT.Palomar.exists_ld_soundness",
+          "MIPStarRE.QPBT.Palomar.pauli_soundness",
+          "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
         ]
       },
-      "evidence": "authoritative",
-      "id": "proof.authoritative_comparator",
+      "evidence": "report-content",
+      "id": "proof.report_content",
       "status": "unknown",
-      "summary": "no official final-snapshot Palomar/comparator report is attached; proof, axiom, and independent-kernel claims are not certified here"
+      "summary": "no full verification report is attached for content validation"
+    },
+    {
+      "details": {
+        "expected_repository": "Dengnifer/QPBT-comparator",
+        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job."
+      },
+      "evidence": "report-content",
+      "id": "repository.public_source",
+      "status": "unknown",
+      "summary": "public-source verification is delegated to the authenticated Palomar run"
+    },
+    {
+      "details": {
+        "expected_repositories": [
+          "leanprover-community/mathlib4"
+        ],
+        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job."
+      },
+      "evidence": "report-content",
+      "id": "challenge.actual_import_origin",
+      "status": "unknown",
+      "summary": "resolved transitive Challenge origins require the full Palomar report"
     }
   ],
   "evidence_model": {
-    "authoritative": "kernel/comparator evidence from an official final-snapshot run",
+    "report-content": "structural and exact-head checks on supplied report JSON; artifact provenance is authenticated separately by the companion-review lane",
     "schema": "validation against a byte-pinned public schema",
     "static": "non-executing source/configuration inspection"
   },
@@ -872,10 +932,10 @@
           "sha256": "213fa1e2c3156892d2d141bd558ba7b62a8e943a60cf1e207489b232a44f6c1d"
         },
         {
-          "bytes": 2717,
+          "bytes": 3085,
           "kind": "file",
           "path": "README.md",
-          "sha256": "ae9759b82b9db8579aefac74970874ec540180032eb6dcc84420fc85aa5f6465"
+          "sha256": "45bc28ee5b9af683f3e7c896702112ab1b37539b348b211cc3cb1bc73984e859"
         },
         {
           "bytes": 501,
@@ -890,10 +950,10 @@
           "sha256": "09d4d92f98bef00ef093186992e80fae5f6c5a01800a9d3eaf4d599b0e76900d"
         },
         {
-          "bytes": 3650,
+          "bytes": 3714,
           "kind": "file",
           "path": "formalization.yaml",
-          "sha256": "573b61fec8e97be425d275eb4862eee39cb8b63165afe746c9099aa3bb9bb936"
+          "sha256": "d8e035103088b7eb02c41bda4ec192bbd4b6b567a20bfeae84fcc8a7c3fe449b"
         },
         {
           "bytes": 3891,
@@ -914,28 +974,28 @@
           "sha256": "2773c517aa90b66ea8a2c52bddddf84393157797f8341be0df45294fff7fd32e"
         },
         {
-          "bytes": 2006,
+          "bytes": 2222,
           "kind": "file",
           "path": "palomar-check.json",
-          "sha256": "31f3b77b421c2540a2451321579110810ce90ecd0a43a02689dafab1aa26c661"
+          "sha256": "a7383b35c37dbefab8f996ab3d3856002531602931a877b789a095985f89977e"
         },
         {
-          "bytes": 2603,
+          "bytes": 4555,
           "kind": "file",
           "path": "tools/palomar/README.md",
-          "sha256": "bf4324f8c00067b2e1cc57eae9be6e7e5f28248fd8c001573928a8305be90d07"
+          "sha256": "f9d476f639d6c20b9b667f20c05be6d7985ea9d0bdde56fdb8e985d7faf145e0"
         },
         {
-          "bytes": 41993,
+          "bytes": 64546,
           "kind": "file",
           "path": "tools/palomar/check.py",
-          "sha256": "c0e5d011799e3507c87d5566b3fbb8bb654e1c3844198471dc37f0db4c74456e"
+          "sha256": "91f5cdf38ff0e75775f4e1ee7f02b311ef3a4fcd5e02bc6c5305031817a81e2c"
         },
         {
-          "bytes": 5891,
+          "bytes": 17379,
           "kind": "file",
           "path": "tools/palomar/tests/test_check.py",
-          "sha256": "6a6512124c2db06889f62409dee134efc104ec7d1e58ce1491bfc4d8891c813e"
+          "sha256": "4a0585a05724a389ad1d459d83fe1cbfd936f96d96a762ce7d5bffcd8e1eee0c"
         },
         {
           "bytes": 1686,
@@ -962,7 +1022,7 @@
           "sha256": "de3959724718b719da979b467f364219c6ce6f47a98c98167eddedfb0bf7f9ec"
         }
       ],
-      "sha256": "ec79c1a2df758f3d0a1c5ef08db6aa38bf537a72185595dcb542c5265f1d83c3"
+      "sha256": "87fc463fbb3e764ecec94006fae1fdd928bf0ae1287bc1b4d9f3204dbd12dd28"
     }
   },
   "overall": "fail",

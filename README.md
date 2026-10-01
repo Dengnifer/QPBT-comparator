@@ -10,6 +10,12 @@ The single comparator run checks these four registered headline declarations:
 - `MIPStarRE.QPBT.pauli_soundness`; and
 - `MIPStarRE.QPBT.pauli_soundness_qubit`.
 
+The separate Palomar preparation profile expects the final compact aliases
+under `MIPStarRE.QPBT.Palomar` and the definition frontier
+`MIPStarRE.QPBT.fixedFieldModel`. This snapshot intentionally leaves the actual
+`comparator.json`, split Challenge, source pin, and toolchain unchanged, so the
+checked-in preparation report remains red until those final inputs land.
+
 ## What The Check Establishes
 
 The official [Lean comparator](https://github.com/leanprover/comparator)
