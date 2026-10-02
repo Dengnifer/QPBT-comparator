@@ -222,6 +222,15 @@ def add(
     checks.append(Check(check_id, status, evidence, summary, details))
 
 
+def aggregate_requirement_status(checks: Iterable[Check]) -> str:
+    statuses = {check.status for check in checks}
+    if "fail" in statuses:
+        return "fail"
+    if "unknown" in statuses:
+        return "unknown"
+    return "pass"
+
+
 def module_path(module_name: str) -> Path:
     return Path(*module_name.split(".")).with_suffix(".lean")
 
@@ -1080,6 +1089,7 @@ def run_checks(
     official_report: Path | None = None,
 ) -> dict[str, Any]:
     checks: list[Check] = []
+    diagnostics: list[Check] = []
     report_relative = config["report_path"]
     excluded = {report_relative}
     files = repository_files(root, excluded)
@@ -1472,19 +1482,21 @@ def run_checks(
             substantive_examples=substantive_evidence["lexical_escape_examples"],
         )
     add(
-        checks, "proof.lexical_source_scan", "unknown", "static",
+        diagnostics, "proof.lexical_source_scan", "unknown", "diagnostic",
         "lexical scans are recorded but cannot certify proof completion or axiom closure",
         **lexical_details,
     )
     checks.extend(official_report_checks(root, official_report, config, expected_axioms))
 
-    statuses = {check.status for check in checks}
-    overall = "fail" if "fail" in statuses else "unknown" if "unknown" in statuses else "pass"
     report: dict[str, Any] = {
         "schema_version": 1,
         "checker": "tools/palomar/check.py",
-        "overall": overall,
+        "overall": aggregate_requirement_status(checks),
         "evidence_model": {
+            "diagnostic": (
+                "non-certifying observations reported separately from requirements and excluded "
+                "from overall status"
+            ),
             "schema": "validation against a byte-pinned public schema",
             "static": "non-executing source/configuration inspection",
             "report-content": (
@@ -1498,6 +1510,7 @@ def run_checks(
             "upstream": config["upstream"],
         },
         "checks": [asdict(check) for check in checks],
+        "diagnostics": [asdict(diagnostic) for diagnostic in diagnostics],
     }
     if substantive_evidence is not None:
         report["inputs"]["substantive"] = {

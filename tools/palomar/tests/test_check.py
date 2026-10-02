@@ -211,6 +211,15 @@ class PalomarCheckTests(unittest.TestCase):
             self.assertEqual(first, second)
             self.assertEqual([item["path"] for item in first["files"]], ["A.lean"])
 
+    def test_run_checks_separates_lexical_diagnostics_from_requirements(self):
+        config = CHECK.load_json(ROOT / "palomar-check.json")
+        report = CHECK.run_checks(ROOT, config, None)
+        check_ids = {item["id"] for item in report["checks"]}
+        diagnostics = {item["id"]: item for item in report["diagnostics"]}
+        self.assertNotIn("proof.lexical_source_scan", check_ids)
+        self.assertEqual(diagnostics["proof.lexical_source_scan"]["status"], "unknown")
+        self.assertEqual(diagnostics["proof.lexical_source_scan"]["evidence"], "diagnostic")
+
     def test_current_profile_and_metadata_use_compact_declarations(self):
         config = CHECK.load_json(ROOT / "palomar-check.json")
         metadata = CHECK.load_yaml(ROOT / "formalization.yaml")
@@ -365,6 +374,42 @@ class PalomarCheckTests(unittest.TestCase):
                 {item.evidence for item in checks.values()}, {"report-content"}
             )
             self.assertIn("content only", checks["proof.report_content"].details["note"])
+
+    def test_requirement_aggregation_preserves_runtime_and_static_gates(self):
+        expected_axioms = {"Classical.choice", "Quot.sound", "propext"}
+        diagnostic = CHECK.Check(
+            "proof.lexical_source_scan",
+            "unknown",
+            "diagnostic",
+            "non-certifying fixture observation",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root, path, config, report = self.report_fixture(directory)
+            complete = CHECK.official_report_checks(
+                root, path, config, expected_axioms
+            )
+            self.assertEqual(CHECK.aggregate_requirement_status(complete), "pass")
+            self.assertEqual(diagnostic.status, "unknown")
+
+            missing = CHECK.official_report_checks(
+                root, None, config, expected_axioms
+            )
+            self.assertEqual(CHECK.aggregate_requirement_status(missing), "unknown")
+
+            report["status"] = "fail"
+            path.write_text(json.dumps(report), encoding="utf-8")
+            failed = CHECK.official_report_checks(
+                root, path, config, expected_axioms
+            )
+            self.assertEqual(CHECK.aggregate_requirement_status(failed), "fail")
+
+            source_failure = CHECK.Check(
+                "source.fixture", "fail", "static", "source requirement failed"
+            )
+            self.assertEqual(
+                CHECK.aggregate_requirement_status([*complete, source_failure]),
+                "fail",
+            )
 
     def test_report_metadata_request_default_explicit_and_selected_records(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -25,7 +25,7 @@
     {
       "details": {
         "byte_limit": 524288000,
-        "bytes": 193276,
+        "bytes": 195899,
         "compiled_artifacts": [],
         "submodules": []
       },
@@ -95,7 +95,7 @@
     {
       "details": {
         "examples": [],
-        "maximum_lines": 992
+        "maximum_lines": 989
       },
       "evidence": "static",
       "id": "source.wrapper_line_cap",
@@ -231,20 +231,20 @@
     {
       "details": {
         "byte_limit": 102400,
-        "bytes": 52483,
+        "bytes": 51979,
         "line_limit": 1000,
-        "lines": 992
+        "lines": 989
       },
       "evidence": "static",
       "id": "challenge.size",
       "status": "pass",
-      "summary": "Challenge is 992 lines and 52483 bytes"
+      "summary": "Challenge is 989 lines and 51979 bytes"
     },
     {
       "details": {
-        "local_closure_bytes": 52483,
+        "local_closure_bytes": 51979,
         "local_closure_files": 1,
-        "local_closure_lines": 992,
+        "local_closure_lines": 989,
         "local_dependencies": [],
         "note": "This static check proves only direct name-prefix and local-file facts. It does not resolve module origins or inspect transitive imports.",
         "trusted_imports": [
@@ -260,7 +260,7 @@
     {
       "details": {
         "canonical_repository": "Dengnifer/MIPStarRE-QPBT",
-        "main_commit": "a2d988344c446fbe0fa1e701bbb69dc5237856c4",
+        "main_commit": "5cb9512fd03cec2116f021852a5c796a732003cd",
         "main_ref": "refs/remotes/github/main",
         "remote": "github",
         "remote_url": "git@github.com:Dengnifer/MIPStarRE-QPBT.git",
@@ -371,6 +371,57 @@
       "status": "pass",
       "summary": "wrapper and substantive repository use the same Lean and Mathlib revisions"
     },
+    {
+      "details": {
+        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job.",
+        "required_axioms": [
+          "Classical.choice",
+          "Quot.sound",
+          "propext"
+        ],
+        "required_definitions": [
+          "MIPStarRE.QPBT.fixedFieldModel"
+        ],
+        "required_kernels": [
+          "con-ron",
+          "nanoda"
+        ],
+        "required_theorems": [
+          "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
+          "MIPStarRE.QPBT.Palomar.exists_ld_soundness",
+          "MIPStarRE.QPBT.Palomar.pauli_soundness",
+          "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
+        ]
+      },
+      "evidence": "report-content",
+      "id": "proof.report_content",
+      "status": "unknown",
+      "summary": "no full verification report is attached for content validation"
+    },
+    {
+      "details": {
+        "expected_repository": "Dengnifer/QPBT-comparator",
+        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job."
+      },
+      "evidence": "report-content",
+      "id": "repository.public_source",
+      "status": "unknown",
+      "summary": "public-source verification is delegated to the authenticated Palomar run"
+    },
+    {
+      "details": {
+        "expected_repositories": [
+          "leanprover-community/mathlib4"
+        ],
+        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job."
+      },
+      "evidence": "report-content",
+      "id": "challenge.actual_import_origin",
+      "status": "unknown",
+      "summary": "resolved transitive Challenge origins require the full Palomar report"
+    }
+  ],
+  "diagnostics": [
     {
       "details": {
         "substantive_examples": [
@@ -546,84 +597,36 @@
         "substantive_matches_at_least": 42,
         "wrapper_examples": [
           {
-            "line": 838,
+            "line": 835,
             "path": "Challenge.lean"
           },
           {
-            "line": 903,
+            "line": 900,
             "path": "Challenge.lean"
           },
           {
-            "line": 929,
+            "line": 926,
             "path": "Challenge.lean"
           },
           {
-            "line": 958,
+            "line": 955,
             "path": "Challenge.lean"
           },
           {
-            "line": 988,
+            "line": 985,
             "path": "Challenge.lean"
           }
         ],
         "wrapper_matches_at_least": 5
       },
-      "evidence": "static",
+      "evidence": "diagnostic",
       "id": "proof.lexical_source_scan",
       "status": "unknown",
       "summary": "lexical scans are recorded but cannot certify proof completion or axiom closure"
-    },
-    {
-      "details": {
-        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job.",
-        "required_axioms": [
-          "Classical.choice",
-          "Quot.sound",
-          "propext"
-        ],
-        "required_definitions": [
-          "MIPStarRE.QPBT.fixedFieldModel"
-        ],
-        "required_kernels": [
-          "con-ron",
-          "nanoda"
-        ],
-        "required_theorems": [
-          "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
-          "MIPStarRE.QPBT.Palomar.exists_ld_soundness",
-          "MIPStarRE.QPBT.Palomar.pauli_soundness",
-          "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
-        ]
-      },
-      "evidence": "report-content",
-      "id": "proof.report_content",
-      "status": "unknown",
-      "summary": "no full verification report is attached for content validation"
-    },
-    {
-      "details": {
-        "expected_repository": "Dengnifer/QPBT-comparator",
-        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job."
-      },
-      "evidence": "report-content",
-      "id": "repository.public_source",
-      "status": "unknown",
-      "summary": "public-source verification is delegated to the authenticated Palomar run"
-    },
-    {
-      "details": {
-        "expected_repositories": [
-          "leanprover-community/mathlib4"
-        ],
-        "note": "This validates supplied JSON content only. The existing companion-review lane must authenticate artifact origin, workflow revision, run, attempt, and job."
-      },
-      "evidence": "report-content",
-      "id": "challenge.actual_import_origin",
-      "status": "unknown",
-      "summary": "resolved transitive Challenge origins require the full Palomar report"
     }
   ],
   "evidence_model": {
+    "diagnostic": "non-certifying observations reported separately from requirements and excluded from overall status",
     "report-content": "structural and exact-head checks on supplied report JSON; artifact provenance is authenticated separately by the companion-review lane",
     "schema": "validation against a byte-pinned public schema",
     "static": "non-executing source/configuration inspection"
@@ -691,10 +694,10 @@
           "sha256": "a1975237be0dc38d61ec40d58f16ff844ef9d2de802a5b04f3ccbff786a58864"
         },
         {
-          "bytes": 52483,
+          "bytes": 51979,
           "kind": "file",
           "path": "Challenge.lean",
-          "sha256": "4600b1c3e2409edf2a68df53a2055516c99646e42750f966cf02e60437700de3"
+          "sha256": "acb66991fbdbc80a9c5d0a7e522f572ba604e6c88b2907f9c43a477438ebe6f8"
         },
         {
           "bytes": 11358,
@@ -709,10 +712,10 @@
           "sha256": "eb5e35250bfaee7e8ca6a98f36bd9628a801f9c7816eea61c2e54336f12dac8c"
         },
         {
-          "bytes": 3512,
+          "bytes": 3682,
           "kind": "file",
           "path": "README.md",
-          "sha256": "46ed6d274d2237216942f2d805332a59ffa267c6a4c780bb3e3f4cc128dd70d0"
+          "sha256": "c6f7547b97482dedf0ddc2757aea5ed45b6c242d0e487f62cdfbf2645541fa6d"
         },
         {
           "bytes": 489,
@@ -757,22 +760,22 @@
           "sha256": "a7383b35c37dbefab8f996ab3d3856002531602931a877b789a095985f89977e"
         },
         {
-          "bytes": 5492,
+          "bytes": 5930,
           "kind": "file",
           "path": "tools/palomar/README.md",
-          "sha256": "4cb5963a397a289475cf492d984ad64e03da6a1c9c88250dc1e387df7c6795ba"
+          "sha256": "7274a956b6421339438da57da22b93cd8f1f9a2367f4825635ee01c7e2f288f8"
         },
         {
-          "bytes": 71861,
+          "bytes": 72282,
           "kind": "file",
           "path": "tools/palomar/check.py",
-          "sha256": "91d1e0a77ee54f322012a32cdda03b96254b7cb47018b1c37eb9235a07feaeef"
+          "sha256": "b58fa6b786be6c49c46637849cfab625743a76842ed1abf2a383c8fd0738c948"
         },
         {
-          "bytes": 21703,
+          "bytes": 23801,
           "kind": "file",
           "path": "tools/palomar/tests/test_check.py",
-          "sha256": "afc9ceb1fc148cb1ae75bb5ceaf3bbe74aad8bc70b299756e7a3bfd3e6327a40"
+          "sha256": "a2469ef69a9da6df8c983dc38bd518eda71d9e79ea237c8f776a1ffbba0f7d30"
         },
         {
           "bytes": 1686,
@@ -793,7 +796,7 @@
           "sha256": "fd40347e4b586e7c42233b35f11efb006d25033b9a7ded9565719edf7aa98354"
         }
       ],
-      "sha256": "cb12a2d23368e73dc2a38582287f720cc5a757d744d99df57852c41245628389"
+      "sha256": "6c2a454cf2f4e18e6cf070cb1dbcd7b283266b642ebc2aa46ce9699f9231f1b6"
     }
   },
   "overall": "fail",

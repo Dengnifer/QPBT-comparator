@@ -27,9 +27,9 @@ run.
 ## Layout
 
 `Challenge.lean` is the complete independent statement surface: one
-Mathlib-only module, 992 physical lines and 52,483 UTF-8 bytes. Its audited
+Mathlib-only module, 989 physical lines and 51,979 UTF-8 bytes. Its audited
 SHA-256 is
-`4600b1c3e2409edf2a68df53a2055516c99646e42750f966cf02e60437700de3`.
+`acb66991fbdbc80a9c5d0a7e522f572ba604e6c88b2907f9c43a477438ebe6f8`.
 The only intended holes are the fixed-field selector value and the four
 registered theorem bodies.
 
@@ -63,7 +63,9 @@ python3 tools/palomar/check.py report \
 
 The report is intentionally red or unknown where runtime evidence is absent.
 Static checks do not prove statement equality, proof completion, axiom closure,
-resolved transitive import origins, or registry acceptance.
+resolved transitive import origins, or registry acceptance. Requirement records
+in `checks` determine `overall`; non-certifying lexical observations are kept
+separately in `diagnostics` and never replace missing runtime evidence.
 
 ## Pending Integration
 

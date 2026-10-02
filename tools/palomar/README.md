@@ -20,11 +20,14 @@ python3 tools/palomar/check.py report \
 ```
 
 `check` prints the same report without writing it. Both commands exit nonzero
-when a static requirement fails; `unknown` report-evidence checks do not hide a
-static failure. The report hashes every wrapper input except its own output and
-binds the separately pinned Lean sources by Git tree and aggregate content
-hashes. It deliberately contains no wrapper commit SHA, so committing a
-regenerated report is not self-referential.
+when a requirement fails; an `unknown` requirement does not hide a failure and
+still prevents `overall` from becoming `pass`. The top-level `checks` array is
+the requirement set aggregated into `overall`. Non-certifying observations are
+stored separately in `diagnostics`; their status is never aggregated. The
+report hashes every wrapper input except its own output and binds the separately
+pinned Lean sources by Git tree and aggregate content hashes. It deliberately
+contains no wrapper commit SHA, so committing a regenerated report is not
+self-referential.
 
 Evidence classes are explicit:
 
@@ -48,6 +51,9 @@ Evidence classes are explicit:
   strings, so an empty metadata request is accepted only when the selected
   report record is the default project `formalization.yaml` with the local
   file's digest. This class does not authenticate where the JSON came from.
+- `diagnostic` records lexical source observations that cannot certify proof
+  completion or axiom closure. These records are informational and do not
+  contribute to `overall`.
 
 Pass a runtime report with `--official-report` only after the companion-review
 lane has bound its artifact to the pinned workflow revision and exact
@@ -55,8 +61,9 @@ run/attempt/job. The local checker deliberately has no API client or signature
 mechanism. Its synthetic unit reports test content validation only; they do not
 establish that a kernel or workflow ran.
 
-Missing runtime evidence leaves public-source and resolved transitive-import
-checks `unknown`. A matching report-content check is not registry acceptance.
+Missing runtime evidence leaves proof-content, public-source, and resolved
+transitive-import requirements `unknown`, so the report cannot pass. A matching
+report-content check is not registry acceptance.
 
 ## Final exact-head sequence
 
