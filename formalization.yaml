@@ -17,7 +17,7 @@ project:
 repository:
   role: "thin-wrapper"
   substantive_formalization:
-    id: "Dengnifer/MIPStarRE-QPBT"
+    id: "Dengnifer/MIPStarRE-QPBT-bak"
     revision: "b18311e49b4ec92d7ab13f1930ecbaa8a76850e8"
 
 classification:
