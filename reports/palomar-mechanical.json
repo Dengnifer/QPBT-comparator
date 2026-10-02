@@ -25,7 +25,7 @@
     {
       "details": {
         "byte_limit": 524288000,
-        "bytes": 195899,
+        "bytes": 195910,
         "compiled_artifacts": [],
         "submodules": []
       },
@@ -46,13 +46,13 @@
     },
     {
       "details": {
-        "bytes": 3973,
+        "bytes": 3984,
         "limit": 262144
       },
       "evidence": "static",
       "id": "metadata.size",
       "status": "pass",
-      "summary": "metadata is 3973 bytes (limit 262144)"
+      "summary": "metadata is 3984 bytes (limit 262144)"
     },
     {
       "details": {
@@ -260,7 +260,7 @@
     {
       "details": {
         "canonical_repository": "Dengnifer/MIPStarRE-QPBT",
-        "main_commit": "5cb9512fd03cec2116f021852a5c796a732003cd",
+        "main_commit": "ad3d45dadd75782c1ca310bb1fd303ff81160541",
         "main_ref": "refs/remotes/github/main",
         "remote": "github",
         "remote_url": "git@github.com:Dengnifer/MIPStarRE-QPBT.git",
@@ -730,10 +730,10 @@
           "sha256": "9c0cf72a4a09d8b7c4deefb1f9b7fa4e1ffd8d10cbf2e90e774aed70dd59a746"
         },
         {
-          "bytes": 3973,
+          "bytes": 3984,
           "kind": "file",
           "path": "formalization.yaml",
-          "sha256": "56a49d5840f6a1aed6def898e9f7eff04948675befffe6867188938112c26520"
+          "sha256": "436473c39213565650d864c314818f2533201171f50f82507019b3969a0d2579"
         },
         {
           "bytes": 3891,
@@ -796,7 +796,7 @@
           "sha256": "fd40347e4b586e7c42233b35f11efb006d25033b9a7ded9565719edf7aa98354"
         }
       ],
-      "sha256": "6c2a454cf2f4e18e6cf070cb1dbcd7b283266b642ebc2aa46ce9699f9231f1b6"
+      "sha256": "3b06f85033a4e63ab4c51cb3dc84569175f1a524d4ed4b9dba5e946d8625618d"
     }
   },
   "overall": "fail",

@@ -23,7 +23,8 @@ repository:
 classification:
   arxiv:
     - "quant-ph"
-  msc2020: []
+  msc2020:
+    - "81P45"
 
 sources:
   - type: "article"
