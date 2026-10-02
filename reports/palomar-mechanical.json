@@ -25,7 +25,7 @@
     {
       "details": {
         "byte_limit": 524288000,
-        "bytes": 327154,
+        "bytes": 193276,
         "compiled_artifacts": [],
         "submodules": []
       },
@@ -46,13 +46,13 @@
     },
     {
       "details": {
-        "bytes": 3714,
+        "bytes": 3973,
         "limit": 262144
       },
       "evidence": "static",
       "id": "metadata.size",
       "status": "pass",
-      "summary": "metadata is 3714 bytes (limit 262144)"
+      "summary": "metadata is 3973 bytes (limit 262144)"
     },
     {
       "details": {
@@ -84,52 +84,18 @@
     },
     {
       "details": {
-        "examples": [
-          "Challenge.lean",
-          "Challenge/MIPStarRE/LDT/Basic/Distribution.lean",
-          "Challenge/MIPStarRE/LDT/Basic/ParametersBase.lean",
-          "Challenge/MIPStarRE/LDT/Preliminaries/Polynomials.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/Coefficients.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/FieldBasis.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/Lines.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/LowDegreeCode.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/Pauli.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/PauliTheorems.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasis.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasisTheorems.lean",
-          "Challenge/MIPStarRE/QPBT/Algebra/Subspaces.lean",
-          "Challenge/MIPStarRE/QPBT/Games/CondLinear.lean",
-          "Challenge/MIPStarRE/QPBT/Games/Consistency.lean",
-          "Challenge/MIPStarRE/QPBT/Games/Defs.lean",
-          "Challenge/MIPStarRE/QPBT/Games/DistributionAux.lean",
-          "Challenge/MIPStarRE/QPBT/Games/StrategyClasses.lean",
-          "Challenge/MIPStarRE/QPBT/Games/TypedCondLinear.lean",
-          "Challenge/MIPStarRE/QPBT/Observables/WinImplications/Setup.lean",
-          "Challenge/MIPStarRE/QPBT/State.lean",
-          "Challenge/MIPStarRE/QPBT/Test/Completeness.lean",
-          "Challenge/MIPStarRE/QPBT/Test/LowDegreeGame.lean",
-          "Challenge/MIPStarRE/QPBT/Test/LowDegreeGameMeasurements.lean",
-          "Challenge/MIPStarRE/QPBT/Test/MagicSquare.lean",
-          "Challenge/MIPStarRE/QPBT/Test/PauliBasisTest.lean",
-          "Challenge/MIPStarRE/QPBT/Test/QubitForm.lean",
-          "Challenge/MIPStarRE/QPBT/Test/SoundnessDefs.lean",
-          "Challenge/MIPStarRE/Quantum/FiniteMatrix/Basic.lean",
-          "Challenge/MIPStarRE/Quantum/FiniteMatrix/NormalizedTrace.lean",
-          "Challenge/MIPStarRE/Quantum/Measurement.lean",
-          "QPBTComparator.lean",
-          "Solution.lean"
-        ],
-        "files_checked": 33
+        "examples": [],
+        "files_checked": 3
       },
       "evidence": "static",
       "id": "source.wrapper_modules",
-      "status": "fail",
-      "summary": "33 wrapper Lean sources lack module headers"
+      "status": "pass",
+      "summary": "all wrapper Lean sources have module headers"
     },
     {
       "details": {
         "examples": [],
-        "maximum_lines": 614
+        "maximum_lines": 992
       },
       "evidence": "static",
       "id": "source.wrapper_line_cap",
@@ -205,24 +171,27 @@
     },
     {
       "details": {
-        "bytes": 386,
+        "bytes": 472,
         "limit": 1048576
       },
       "evidence": "static",
       "id": "comparator.size",
       "status": "pass",
-      "summary": "Comparator configuration is 386 bytes (limit 1048576)"
+      "summary": "Comparator configuration is 472 bytes (limit 1048576)"
     },
     {
       "details": {
         "actual_keys": [
           "challenge_module",
+          "definition_names",
           "enable_nanoda",
           "permitted_axioms",
           "solution_module",
           "theorem_names"
         ],
-        "definition_names": [],
+        "definition_names": [
+          "MIPStarRE.QPBT.fixedFieldModel"
+        ],
         "enable_nanoda": true,
         "note": "Palomar's official verifier injects protected NanoDa and con-ron commands; this field is compatibility data, not kernel evidence.",
         "parse_error": null,
@@ -238,16 +207,16 @@
           "theorem_names"
         ],
         "theorem_names": [
-          "MIPStarRE.QPBT.pauli_soundness",
-          "MIPStarRE.QPBT.pauli_soundness_qubit",
-          "MIPStarRE.QPBT.exists_spcc_value_one",
-          "MIPStarRE.QPBT.exists_ld_soundness"
+          "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
+          "MIPStarRE.QPBT.Palomar.exists_ld_soundness",
+          "MIPStarRE.QPBT.Palomar.pauli_soundness",
+          "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
         ]
       },
       "evidence": "static",
       "id": "comparator.configuration",
-      "status": "fail",
-      "summary": "Comparator config differs from the selected Palomar declaration profile"
+      "status": "pass",
+      "summary": "Comparator config names the exact theorem and definition frontiers and three standard axioms"
     },
     {
       "details": {
@@ -262,52 +231,21 @@
     {
       "details": {
         "byte_limit": 102400,
-        "bytes": 13389,
+        "bytes": 52483,
         "line_limit": 1000,
-        "lines": 225
+        "lines": 992
       },
       "evidence": "static",
       "id": "challenge.size",
       "status": "pass",
-      "summary": "Challenge is 225 lines and 13389 bytes"
+      "summary": "Challenge is 992 lines and 52483 bytes"
     },
     {
       "details": {
-        "local_closure_bytes": 181816,
-        "local_closure_files": 31,
-        "local_closure_lines": 3956,
-        "local_dependencies": [
-          "Challenge.MIPStarRE.LDT.Basic.Distribution",
-          "Challenge.MIPStarRE.LDT.Basic.ParametersBase",
-          "Challenge.MIPStarRE.LDT.Preliminaries.Polynomials",
-          "Challenge.MIPStarRE.QPBT.Algebra.Coefficients",
-          "Challenge.MIPStarRE.QPBT.Algebra.FieldBasis",
-          "Challenge.MIPStarRE.QPBT.Algebra.Lines",
-          "Challenge.MIPStarRE.QPBT.Algebra.LowDegreeCode",
-          "Challenge.MIPStarRE.QPBT.Algebra.Pauli",
-          "Challenge.MIPStarRE.QPBT.Algebra.PauliTheorems",
-          "Challenge.MIPStarRE.QPBT.Algebra.SelfDualBasis",
-          "Challenge.MIPStarRE.QPBT.Algebra.SelfDualBasisTheorems",
-          "Challenge.MIPStarRE.QPBT.Algebra.Subspaces",
-          "Challenge.MIPStarRE.QPBT.Games.CondLinear",
-          "Challenge.MIPStarRE.QPBT.Games.Consistency",
-          "Challenge.MIPStarRE.QPBT.Games.Defs",
-          "Challenge.MIPStarRE.QPBT.Games.DistributionAux",
-          "Challenge.MIPStarRE.QPBT.Games.StrategyClasses",
-          "Challenge.MIPStarRE.QPBT.Games.TypedCondLinear",
-          "Challenge.MIPStarRE.QPBT.Observables.WinImplications.Setup",
-          "Challenge.MIPStarRE.QPBT.State",
-          "Challenge.MIPStarRE.QPBT.Test.Completeness",
-          "Challenge.MIPStarRE.QPBT.Test.LowDegreeGame",
-          "Challenge.MIPStarRE.QPBT.Test.LowDegreeGameMeasurements",
-          "Challenge.MIPStarRE.QPBT.Test.MagicSquare",
-          "Challenge.MIPStarRE.QPBT.Test.PauliBasisTest",
-          "Challenge.MIPStarRE.QPBT.Test.QubitForm",
-          "Challenge.MIPStarRE.QPBT.Test.SoundnessDefs",
-          "Challenge.MIPStarRE.Quantum.FiniteMatrix.Basic",
-          "Challenge.MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace",
-          "Challenge.MIPStarRE.Quantum.Measurement"
-        ],
+        "local_closure_bytes": 52483,
+        "local_closure_files": 1,
+        "local_closure_lines": 992,
+        "local_dependencies": [],
         "note": "This static check proves only direct name-prefix and local-file facts. It does not resolve module origins or inspect transitive imports.",
         "trusted_imports": [
           "Mathlib"
@@ -316,13 +254,13 @@
       },
       "evidence": "static",
       "id": "challenge.static_import_boundary",
-      "status": "fail",
-      "summary": "Challenge reaches local modules or import spellings outside the profile"
+      "status": "pass",
+      "summary": "Challenge import spellings use only profile-approved roots"
     },
     {
       "details": {
         "canonical_repository": "Dengnifer/MIPStarRE-QPBT",
-        "main_commit": "024f20ac44aa92cb24809d128d4aad130783b6e3",
+        "main_commit": "a2d988344c446fbe0fa1e701bbb69dc5237856c4",
         "main_ref": "refs/remotes/github/main",
         "remote": "github",
         "remote_url": "git@github.com:Dengnifer/MIPStarRE-QPBT.git",
@@ -608,31 +546,27 @@
         "substantive_matches_at_least": 42,
         "wrapper_examples": [
           {
-            "line": 44,
+            "line": 838,
             "path": "Challenge.lean"
           },
           {
-            "line": 134,
+            "line": 903,
             "path": "Challenge.lean"
           },
           {
-            "line": 168,
+            "line": 929,
             "path": "Challenge.lean"
           },
           {
-            "line": 195,
+            "line": 958,
             "path": "Challenge.lean"
           },
           {
-            "line": 207,
-            "path": "Challenge.lean"
-          },
-          {
-            "line": 223,
+            "line": 988,
             "path": "Challenge.lean"
           }
         ],
-        "wrapper_matches_at_least": 6
+        "wrapper_matches_at_least": 5
       },
       "evidence": "static",
       "id": "proof.lexical_source_scan",
@@ -745,202 +679,22 @@
     "wrapper": {
       "files": [
         {
-          "bytes": 3860,
+          "bytes": 594,
           "kind": "file",
           "path": ".github/workflows/comparator.yml",
-          "sha256": "6e7a3e0452e7474a7991a72c3c847cc7e6d22405888c9729dacf141880d5f0fc"
+          "sha256": "7ec4603377f006aa963d6b1fb508c43cb50169abefb44ccdf6a4be09cd56e298"
         },
         {
-          "bytes": 107,
+          "bytes": 55,
           "kind": "file",
           "path": ".gitignore",
-          "sha256": "d8bc971cc780c51c8c36b0e7d3046fffcaab33094ecda4e7225d2be868e5679a"
+          "sha256": "a1975237be0dc38d61ec40d58f16ff844ef9d2de802a5b04f3ccbff786a58864"
         },
         {
-          "bytes": 6593,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/LDT/Basic/Distribution.lean",
-          "sha256": "732b279ab49a36923d2fcdf1721ddc88a807a698d5b55427c1492ae89fc17761"
-        },
-        {
-          "bytes": 1078,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/LDT/Basic/ParametersBase.lean",
-          "sha256": "49e35470550907217d4774a92249a1f0ddbd3cdb8ea28d072e7171eb175afd0f"
-        },
-        {
-          "bytes": 879,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/LDT/Preliminaries/Polynomials.lean",
-          "sha256": "aa20d7167fc545521aa6804e1c53cfc57ef9cd22bb9cd0d96b29edc91fcf9f8a"
-        },
-        {
-          "bytes": 896,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/Coefficients.lean",
-          "sha256": "80b577b422a812bf9e80ce3d32d80c5267082f4c6e1f452bae553a03a1644e5b"
-        },
-        {
-          "bytes": 25746,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/FieldBasis.lean",
-          "sha256": "ea84484b624f2a07fed7c397a93e1c576493229c92fd8ad6e8c362ea00f310c9"
-        },
-        {
-          "bytes": 1545,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/Lines.lean",
-          "sha256": "de3ecc7573f0f32706a7c6a8d81b37f91a5ee37f356bacaa15fe5ec5c458e370"
-        },
-        {
-          "bytes": 2761,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/LowDegreeCode.lean",
-          "sha256": "192812c010c2401c3f60d3e673f457fe0ae781d81100f1462cc62cc894608d9f"
-        },
-        {
-          "bytes": 3386,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/Pauli.lean",
-          "sha256": "c8c59ec6c171b733e1d1267df00a1efe35d3ce849aff1591a575414cf65c8075"
-        },
-        {
-          "bytes": 1237,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/PauliTheorems.lean",
-          "sha256": "ed3f74220230a559438a0b815b87598fa6dabd5a75db7c60a6bb96cbec984ec3"
-        },
-        {
-          "bytes": 1600,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasis.lean",
-          "sha256": "2283e9ec0a05ee5bdd3a16bc77f04db8c000a4b7cb666ed46650a5f8ec83d4df"
-        },
-        {
-          "bytes": 990,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/SelfDualBasisTheorems.lean",
-          "sha256": "ededadbc622d7480bf6bd1f2a96b5d23a0638db481fa78468b42f47a36b9c2c4"
-        },
-        {
-          "bytes": 10509,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Algebra/Subspaces.lean",
-          "sha256": "f42789b0ba2de8496c91861d0ada5333297beaa540fc7da05741743f86859693"
-        },
-        {
-          "bytes": 2605,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Games/CondLinear.lean",
-          "sha256": "2cf0f4ef97d2b5b217f0c8a7a43d00acd5042814639e7f9d0aae188fb3668281"
-        },
-        {
-          "bytes": 1320,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Games/Consistency.lean",
-          "sha256": "a1981f9f8b109aa888f34fc929610fdaa713274a2ac4514db1cfc94befb9363a"
-        },
-        {
-          "bytes": 4975,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Games/Defs.lean",
-          "sha256": "fd18a6feb5e0e3d9b5abd5f66bbe8e2dc713ba625fb08ab88b4589d7bf3d546a"
-        },
-        {
-          "bytes": 8245,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Games/DistributionAux.lean",
-          "sha256": "880bbe1d72365a0acbd7dee3933db23160321fb15c55fc0afb28b5b39ae28990"
-        },
-        {
-          "bytes": 5802,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Games/StrategyClasses.lean",
-          "sha256": "263ca2f3c64028fb1a2b561e8216b3e86e42ac4ed246324e4fdcf83da25fff47"
-        },
-        {
-          "bytes": 5176,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Games/TypedCondLinear.lean",
-          "sha256": "3476b430a45aef4442c7cc044e9986ed261d4c58c9a8e477d1ae308a6667a5d8"
-        },
-        {
-          "bytes": 1230,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Observables/WinImplications/Setup.lean",
-          "sha256": "f37d237155685695225a0a6500ec14f3380559614dbff162f199f817073533cf"
-        },
-        {
-          "bytes": 2719,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/State.lean",
-          "sha256": "42bbc3c03d3ec2a465166d8ec0a8a6331414c73d10449b53cc277c1f0d29b256"
-        },
-        {
-          "bytes": 7830,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/Completeness.lean",
-          "sha256": "e43d85579a6f6c7f66ed5327720a94902c44a73febf342d9883fad8ace460e48"
-        },
-        {
-          "bytes": 14745,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/LowDegreeGame.lean",
-          "sha256": "c80d4e1e776b7a34b25f9c4756f3dc61b3e337e24bc7b40b843745b228d6d617"
-        },
-        {
-          "bytes": 5564,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/LowDegreeGameMeasurements.lean",
-          "sha256": "204fbcf7a1d365f644c5dcfe1313187dc7f1d9ad997cb0a7a723ea61686d0293"
-        },
-        {
-          "bytes": 3609,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/MagicSquare.lean",
-          "sha256": "2417773bee2747d1daf3c5105fb16dc6574ab401b959527a957313d623b23672"
-        },
-        {
-          "bytes": 28526,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/PauliBasisTest.lean",
-          "sha256": "d8d7b2ffd328e6608d655b2423d0e87881b60845343eae1d42bd27b625534d8f"
-        },
-        {
-          "bytes": 6244,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/QubitForm.lean",
-          "sha256": "fd2d9daf0b4f894e408a3b61e449c7cc3b0100b199f1a7f81df918c83e69d2a6"
-        },
-        {
-          "bytes": 7593,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/QPBT/Test/SoundnessDefs.lean",
-          "sha256": "1f36a42d90be059357827ef3cc5a5040f447730afc228bbd9373d2b82242b389"
-        },
-        {
-          "bytes": 632,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/Quantum/FiniteMatrix/Basic.lean",
-          "sha256": "3775a9a7883338c16e1d5cdebe14516b0c08ded74b324b937d98e72235a47405"
-        },
-        {
-          "bytes": 932,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/Quantum/FiniteMatrix/NormalizedTrace.lean",
-          "sha256": "25e38be9b80252abc837aeb70dfcdd6c21167c0f1de810c061efb3826cc22220"
-        },
-        {
-          "bytes": 3460,
-          "kind": "file",
-          "path": "Challenge/MIPStarRE/Quantum/Measurement.lean",
-          "sha256": "a970d19fe483b5f439e3035101a00f8acedbc38cd03e340a72a56e353cae68f9"
-        },
-        {
-          "bytes": 13389,
+          "bytes": 52483,
           "kind": "file",
           "path": "Challenge.lean",
-          "sha256": "35d6ec1df8b3c66d9104ec1ee4d0b15a2bf39249f8fe085bb0c35725ab04c48c"
+          "sha256": "4600b1c3e2409edf2a68df53a2055516c99646e42750f966cf02e60437700de3"
         },
         {
           "bytes": 11358,
@@ -949,34 +703,34 @@
           "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
         },
         {
-          "bytes": 105,
+          "bytes": 120,
           "kind": "file",
           "path": "QPBTComparator.lean",
-          "sha256": "213fa1e2c3156892d2d141bd558ba7b62a8e943a60cf1e207489b232a44f6c1d"
+          "sha256": "eb5e35250bfaee7e8ca6a98f36bd9628a801f9c7816eea61c2e54336f12dac8c"
         },
         {
-          "bytes": 3085,
+          "bytes": 3512,
           "kind": "file",
           "path": "README.md",
-          "sha256": "45bc28ee5b9af683f3e7c896702112ab1b37539b348b211cc3cb1bc73984e859"
+          "sha256": "46ed6d274d2237216942f2d805332a59ffa267c6a4c780bb3e3f4cc128dd70d0"
         },
         {
-          "bytes": 501,
+          "bytes": 489,
           "kind": "file",
           "path": "Solution.lean",
-          "sha256": "5ace73ffa4cda9eb7ad5bf37d87cdfbb4ef733b54349916e0a4e81eb8f8d48d7"
+          "sha256": "e0cec225aa8797ce5c862eabcae8e3de8f481a68f8128b1f0b626f685f409b97"
         },
         {
-          "bytes": 386,
+          "bytes": 472,
           "kind": "file",
           "path": "comparator.json",
-          "sha256": "09d4d92f98bef00ef093186992e80fae5f6c5a01800a9d3eaf4d599b0e76900d"
+          "sha256": "9c0cf72a4a09d8b7c4deefb1f9b7fa4e1ffd8d10cbf2e90e774aed70dd59a746"
         },
         {
-          "bytes": 3714,
+          "bytes": 3973,
           "kind": "file",
           "path": "formalization.yaml",
-          "sha256": "d8e035103088b7eb02c41bda4ec192bbd4b6b567a20bfeae84fcc8a7c3fe449b"
+          "sha256": "56a49d5840f6a1aed6def898e9f7eff04948675befffe6867188938112c26520"
         },
         {
           "bytes": 3891,
@@ -985,10 +739,10 @@
           "sha256": "aaa0c34a5bb61b0a32e1f7f822295713609075ed60f12dd3a1ada4a370a49636"
         },
         {
-          "bytes": 664,
+          "bytes": 592,
           "kind": "file",
           "path": "lakefile.toml",
-          "sha256": "e207a84d0236f4019871c2d9993dfed6b95d8de459015f405631d0a541a33e3b"
+          "sha256": "1bc8781aa8babe1ec2cf3f03931acb25d2da206465f86239f2bc4ceff1ffb6c8"
         },
         {
           "bytes": 25,
@@ -1003,10 +757,10 @@
           "sha256": "a7383b35c37dbefab8f996ab3d3856002531602931a877b789a095985f89977e"
         },
         {
-          "bytes": 5460,
+          "bytes": 5492,
           "kind": "file",
           "path": "tools/palomar/README.md",
-          "sha256": "55eb608044c03adeca70b888aeeda6e3aa6813f2ef7f46225ad8df24a2939f0b"
+          "sha256": "4cb5963a397a289475cf492d984ad64e03da6a1c9c88250dc1e387df7c6795ba"
         },
         {
           "bytes": 71861,
@@ -1037,15 +791,9 @@
           "kind": "file",
           "path": "tools/palomar/upstream/toolchains.json",
           "sha256": "fd40347e4b586e7c42233b35f11efb006d25033b9a7ded9565719edf7aa98354"
-        },
-        {
-          "bytes": 1962,
-          "kind": "file",
-          "path": "verify.sh",
-          "sha256": "de3959724718b719da979b467f364219c6ce6f47a98c98167eddedfb0bf7f9ec"
         }
       ],
-      "sha256": "71bb073cd5dce1fb8b0bbee590ad24eefa2ad7a6ed258207ad8874eef1c9a021"
+      "sha256": "cb12a2d23368e73dc2a38582287f720cc5a757d744d99df57852c41245628389"
     }
   },
   "overall": "fail",

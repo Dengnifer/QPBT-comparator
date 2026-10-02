@@ -1,77 +1,79 @@
 # QPBT-comparator
 
-Comparator challenge for the Lean 4 formalization of the quantum Pauli basis
-test in [Dengnifer/MIPStarRE-A](https://github.com/Dengnifer/MIPStarRE-A).
+Thin comparator wrapper for the Lean 4 formalization of the quantum Pauli
+basis test in the canonical substantive repository
+[Dengnifer/MIPStarRE-QPBT](https://github.com/Dengnifer/MIPStarRE-QPBT).
 
-The single comparator run checks these four registered headline declarations:
+The comparator registers these four compact headline declarations, in order:
 
-- `MIPStarRE.QPBT.exists_spcc_value_one`;
-- `MIPStarRE.QPBT.exists_ld_soundness`;
-- `MIPStarRE.QPBT.pauli_soundness`; and
-- `MIPStarRE.QPBT.pauli_soundness_qubit`.
+- `MIPStarRE.QPBT.Palomar.exists_spcc_value_one`;
+- `MIPStarRE.QPBT.Palomar.exists_ld_soundness`;
+- `MIPStarRE.QPBT.Palomar.pauli_soundness`; and
+- `MIPStarRE.QPBT.Palomar.pauli_soundness_qubit`.
 
-The separate Palomar preparation profile expects the final compact aliases
-under `MIPStarRE.QPBT.Palomar` and the definition frontier
-`MIPStarRE.QPBT.fixedFieldModel`. This snapshot intentionally leaves the actual
-`comparator.json`, split Challenge, source pin, and toolchain unchanged, so the
-checked-in preparation report remains red until those final inputs land.
+It also registers the definition frontier
+`MIPStarRE.QPBT.fixedFieldModel` and permits only `propext`, `Quot.sound`, and
+`Classical.choice`.
 
 ## What The Check Establishes
 
-The official [Lean comparator](https://github.com/leanprover/comparator)
-exports the challenge and solution environments and compares the complete
-statement closure declaration by declaration. A successful run establishes
-that the library proves exactly the four challenge statements, that every
-constant in their statement closures agrees, and that the proofs use no axioms
-beyond `propext`, `Quot.sound`, and `Classical.choice`. The workflow also
-replays the environment through Lean's kernel, `lean4checker`, and the
-independent nanoda kernel.
+The official comparator exports the Challenge and Solution environments and
+compares the registered declaration closures. A successful full run would
+establish equality of the four theorem statements and the selector type, then
+check the solution values transitively against the permitted axioms and the
+configured independent kernels. This source-only draft has not completed that
+run.
 
 ## Layout
 
-`Challenge.lean` imports 30 generated modules below `Challenge/`, one for each
-contributing library module. Those 31 files import only Mathlib and other
-generated challenge modules. Mirroring the library module partition is
-necessary because compiler-generated auxiliary names and instance visibility
-are module-sensitive.
+`Challenge.lean` is the complete independent statement surface: one
+Mathlib-only module, 992 physical lines and 52,483 UTF-8 bytes. Its audited
+SHA-256 is
+`4600b1c3e2409edf2a68df53a2055516c99646e42750f966cf02e60437700de3`.
+The only intended holes are the fixed-field selector value and the four
+registered theorem bodies.
 
-`Solution.lean` imports the four library theorem modules. `comparator.json`
-names the four targets and the three permitted axioms. `lakefile.toml` and
-`lake-manifest.json` pin the exact library revision used to generate the
-challenge.
+`Solution.lean` is a thin module importing exactly
+`MIPStarRE.QPBT.Palomar.PauliCompleteness`,
+`MIPStarRE.QPBT.Palomar.LowDegreeSoundness`, and
+`MIPStarRE.QPBT.Palomar.PauliSoundness`. `QPBTComparator.lean` only re-exports
+that solution module. No generated helper Lean files remain in this wrapper.
 
-## Verification
+## Official Caller
 
-On Linux with Landlock, Go, a current Rust toolchain, `jq`, and `elan`, run:
+`.github/workflows/comparator.yml` is the pinned native caller for
+`PalomarRegistry/PalomarSubmission` revision
+`65f0154ed776cd26c224254aa57b379137f28b0d`. It requests full mode with the
+hosted `palomar-standard-v1` execution profile and binds both the reusable
+workflow and pipeline revision to that commit. There is no local substitute
+verifier; the authenticated workflow artifact is required for final evidence.
 
-```sh
-./verify.sh
-```
+## Preparation Checks
 
-This invokes the unchanged official comparator with real landrun and nanoda.
-For diagnostics only, `./verify.sh --fake-landrun` substitutes the comparator's
-development sandbox and disables nanoda; that mode is not official acceptance.
-
-The authoritative GitHub workflow checks the Mathlib-only import boundary,
-the full revision pin, Lean compilation and kernel replay, then runs the real
-landrun/nanoda comparison.
-
-## Source Pin
-
-This candidate pins MIPStarRE-A commit
-`ecb97d1f66eec1e6fad964f144f78b91ce1fab36`, the service-merged PR 671 commit
-on `main`. The checked-in 31-file challenge is byte-identical to
-`scripts/comparator/expected/qpbt/` at that source commit.
-
-## Regeneration
-
-From the pinned MIPStarRE-A checkout, run:
+The non-executing checker validates the metadata schema, repository layout,
+module headers, size limits, immutable pins, Challenge import spelling, and the
+shape of a supplied official report:
 
 ```sh
-python3 scripts/comparator/check_challenge_drift.py \
-  --root . --challenge qpbt --update
+python3 -m unittest discover -s tools/palomar/tests -v
+python3 tools/palomar/check.py report \
+  --substantive-repo /path/to/MIPStarRE-QPBT \
+  --output reports/palomar-mechanical.json
 ```
 
-Then replace this repository's `Challenge.lean` and `Challenge/` with the
-contents of `scripts/comparator/expected/qpbt/`, and update the MIPStarRE
-revision in both Lake files in the same commit.
+The report is intentionally red or unknown where runtime evidence is absent.
+Static checks do not prove statement equality, proof completion, axiom closure,
+resolved transitive import origins, or registry acceptance.
+
+## Pending Integration
+
+The Lake files still carry the historical MIPStarRE-A pin
+`ecb97d1f66eec1e6fad964f144f78b91ce1fab36` and Lean/Mathlib v4.32.0. That
+revision does not contain the compact solution modules, and v4.32.0 is below
+the v4.35.0-rc2 minimum recorded by the pinned policy. The regenerated report
+also measures that historical substantive tree at 1,809,506,272 bytes, above
+the 500 MiB cap, and records its source-module requirements as failing. The
+dependency URL, final main-reachable library revision, final supported-version
+manifest, completed module migration, native comparator run, authenticated
+runtime artifact, and independent exact-head review all remain pending. They
+must move together; this draft is not ready for submission.

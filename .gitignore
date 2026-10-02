@@ -4,7 +4,3 @@ build/
 __pycache__/
 *.py[cod]
 .DS_Store
-comparator
-landrun
-nanoda_lib
-comparator.local.json

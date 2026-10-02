@@ -49,19 +49,19 @@ status:
   main_results:
     - name: "Pauli basis test completeness"
       declaration: "MIPStarRE.QPBT.Palomar.exists_spcc_value_one"
-      file: "MIPStarRE/QPBT/Test/Completeness.lean"
+      file: "MIPStarRE/QPBT/Palomar/PauliCompleteness.lean"
       comparator_config: "comparator.json"
     - name: "Simultaneous low-degree test soundness"
       declaration: "MIPStarRE.QPBT.Palomar.exists_ld_soundness"
-      file: "MIPStarRE/QPBT/Test/LowDegreeGameTheorems.lean"
+      file: "MIPStarRE/QPBT/Palomar/LowDegreeSoundness.lean"
       comparator_config: "comparator.json"
     - name: "Pauli basis test soundness"
       declaration: "MIPStarRE.QPBT.Palomar.pauli_soundness"
-      file: "MIPStarRE/QPBT/Test/Soundness.lean"
+      file: "MIPStarRE/QPBT/Palomar/PauliSoundness.lean"
       comparator_config: "comparator.json"
     - name: "Qubit-coordinate Pauli soundness"
       declaration: "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
-      file: "MIPStarRE/QPBT/Test/QubitForm.lean"
+      file: "MIPStarRE/QPBT/Palomar/PauliSoundness.lean"
       comparator_config: "comparator.json"
   declarations:
     - "MIPStarRE.QPBT.Palomar.exists_spcc_value_one"
@@ -72,12 +72,14 @@ status:
 alignment:
   source_statement: "other"
   translation_notes: >-
-    The four registered declarations retain the current comparator candidate's
-    parameter order, quantifier order, witnesses, and explicit deltaLd or
-    deltaQld error forms. The substantive repository documents proof-route and
-    printed-source corrections separately. This draft makes no independent
-    equivalence or faithfulness claim; comparator equality alone would not
-    establish one.
+    The four compact declarations retain the registered parameter and
+    quantifier order, witnesses, explicit deltaLd or deltaQld bounds, and the
+    complete fixed-field selector contract. An Astra source comparison found
+    no substantive drift, but that comparison is AI review, not human
+    approval. The inherited zero-direction convention and alternative
+    low-degree proof-route qualifications remain documented in the substantive
+    repository. Native comparator equality, supported-version replay, the
+    final main-reachable library pin, and exact-head review remain pending.
 
 automation:
   methods:
@@ -85,8 +87,9 @@ automation:
       framework: "MIPStarRE-dev local coding-agent workflow"
       tool_setup: >-
         AI coding agents edited Lean, documentation, and repository tooling;
-        deterministic local scripts, Lean, and the official comparator were
-        used for mechanical checks at recorded snapshots.
+        deterministic local scripts and Lean checks were used at recorded
+        snapshots. The official comparator run for this exact wrapper draft is
+        still pending.
   notes: >-
     This work is AI-generated. Ruixuan Deng is the responsible owner and made
     the recorded project decisions. No human review beyond those owner

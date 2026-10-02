@@ -86,14 +86,15 @@ checks `unknown`. A matching report-content check is not registry acceptance.
 
 ## Pending final integration
 
-- Replace the old split Challenge and old library pin, add the four compact
-  `MIPStarRE.QPBT.Palomar` aliases and `MIPStarRE.QPBT.fixedFieldModel` to the
-  actual comparator configuration, then regenerate this report.
-- Replace the current archive-heavy substantive pin with a losslessly compacted
-  revision below Palomar's 500 MiB source cap. Until then the preparation report
-  must remain red and record the measured committed-tree byte count.
-- Confirm the final toolchain against Palomar's then-current minimum and update
-  the vendored policy snapshots if upstream changed.
+- Replace the historical dependency URL, revision, Lean toolchain, and manifest
+  together with one main-reachable MIPStarRE-QPBT revision that contains the
+  three compact solution modules and the completed all-source module migration.
+- Pin a substantive revision below Palomar's 500 MiB source cap. Until then the
+  preparation report must remain red and record the measured committed-tree
+  byte count.
+- Replay the exact single-file Challenge and three-module Solution on the
+  supported toolchain, then run the pinned reusable full workflow and
+  authenticate its artifact through the companion-review lane.
 - Keep `review.status: unchecked` until a real human review is recorded.
 - The owner must confirm final credit and submission authorization in the
   submission note/form. This draft records Ruixuan Deng as responsible owner,
