@@ -224,7 +224,7 @@ class PalomarCheckTests(unittest.TestCase):
         config = CHECK.load_json(ROOT / "palomar-check.json")
         metadata = CHECK.load_yaml(ROOT / "formalization.yaml")
         self.assertEqual(config["schema_version"], 1)
-        self.assertEqual(config["canonical_substantive_repository"], "Dengnifer/MIPStarRE-QPBT")
+        self.assertEqual(config["canonical_substantive_repository"], "Dengnifer/MIPStarRE-QPBT-bak")
         self.assertEqual(config["expected_definitions"], ["MIPStarRE.QPBT.fixedFieldModel"])
         main_results = metadata["status"]["main_results"]
         self.assertTrue(

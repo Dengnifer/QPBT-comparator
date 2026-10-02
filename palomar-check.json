@@ -6,7 +6,7 @@
   "report_path": "reports/palomar-mechanical.json",
   "wrapper_repository": "Dengnifer/QPBT-comparator",
   "substantive_dependency_name": "MIPStarRE",
-  "canonical_substantive_repository": "Dengnifer/MIPStarRE-QPBT",
+  "canonical_substantive_repository": "Dengnifer/MIPStarRE-QPBT-bak",
   "expected_theorems": [
     "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
     "MIPStarRE.QPBT.Palomar.exists_ld_soundness",

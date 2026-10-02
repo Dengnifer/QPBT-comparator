@@ -9,7 +9,7 @@ maxSynthPendingDepth = 3
 
 [[require]]
 name = "MIPStarRE"
-git = "https://github.com/Dengnifer/MIPStarRE-QPBT.git"
+git = "https://github.com/Dengnifer/MIPStarRE-QPBT-bak.git"
 rev = "b18311e49b4ec92d7ab13f1930ecbaa8a76850e8"
 
 [[lean_lib]]

@@ -1,7 +1,9 @@
 # QPBT-comparator
 
+The current Palomar submission lives in [Dengnifer/MIPStarRE-QPBT](https://github.com/Dengnifer/MIPStarRE-QPBT).
+
 A thin wrapper for the quantum Pauli basis test formalization in
-[Dengnifer/MIPStarRE-QPBT](https://github.com/Dengnifer/MIPStarRE-QPBT).
+[Dengnifer/MIPStarRE-QPBT-bak](https://github.com/Dengnifer/MIPStarRE-QPBT-bak).
 The immutable substantive revision is recorded in `lakefile.toml`,
 `lake-manifest.json`, and `formalization.yaml`.
 
