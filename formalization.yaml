@@ -18,7 +18,7 @@ repository:
   role: "thin-wrapper"
   substantive_formalization:
     id: "Dengnifer/MIPStarRE-QPBT"
-    revision: "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+    revision: "8baaa22256aa5ff7946c82efc1fefcf95f97abbc"
 
 classification:
   arxiv:
@@ -27,7 +27,7 @@ classification:
     - "81P45"
 
 sources:
-  - type: "article"
+  - type: "paper"
     title: "MIP*=RE"
     authors:
       - "Zhengfeng Ji"
@@ -79,8 +79,8 @@ alignment:
     no substantive drift, but that comparison is AI review, not human
     approval. The inherited zero-direction convention and alternative
     low-degree proof-route qualifications remain documented in the substantive
-    repository. Native comparator equality, supported-version replay, the
-    final main-reachable library pin, and exact-head review remain pending.
+    repository. The compact declarations are transported from the original
+    library theorems by proved game, strategy, and extraction equivalences.
 
 automation:
   methods:
@@ -89,12 +89,13 @@ automation:
       tool_setup: >-
         AI coding agents edited Lean, documentation, and repository tooling;
         deterministic local scripts and Lean checks were used at recorded
-        snapshots. The official comparator run for this exact wrapper draft is
-        still pending.
+        snapshots. The pinned official Palomar workflow checks this wrapper
+        with Comparator and independent kernels; its result is bound to the
+        exact wrapper commit in GitHub Actions.
   notes: >-
     This work is AI-generated. Ruixuan Deng is the responsible owner and made
     the recorded project decisions. No human review beyond those owner
-    decisions is claimed by this metadata draft.
+    decisions is claimed by this metadata.
 
 review:
   status: "unchecked"

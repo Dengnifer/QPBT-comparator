@@ -9,10 +9,8 @@ maxSynthPendingDepth = 3
 
 [[require]]
 name = "MIPStarRE"
-git = "https://github.com/Dengnifer/MIPStarRE-A.git"
-# Pre-integration pin retained until the compact modules and supported
-# toolchain are available together on canonical MIPStarRE-QPBT main.
-rev = "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+git = "https://github.com/Dengnifer/MIPStarRE-QPBT.git"
+rev = "8baaa22256aa5ff7946c82efc1fefcf95f97abbc"
 
 [[lean_lib]]
 name = "Challenge"

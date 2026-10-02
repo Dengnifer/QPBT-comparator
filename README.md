@@ -1,81 +1,84 @@
 # QPBT-comparator
 
-Thin comparator wrapper for the Lean 4 formalization of the quantum Pauli
-basis test in the canonical substantive repository
+A thin wrapper for the quantum Pauli basis test formalization in
 [Dengnifer/MIPStarRE-QPBT](https://github.com/Dengnifer/MIPStarRE-QPBT).
+The immutable substantive revision is recorded in `lakefile.toml`,
+`lake-manifest.json`, and `formalization.yaml`.
 
-The comparator registers these four compact headline declarations, in order:
+## Mathematical claims
 
-- `MIPStarRE.QPBT.Palomar.exists_spcc_value_one`;
-- `MIPStarRE.QPBT.Palomar.exists_ld_soundness`;
-- `MIPStarRE.QPBT.Palomar.pauli_soundness`; and
-- `MIPStarRE.QPBT.Palomar.pauli_soundness_qubit`.
+All strategies in these statements are finite-dimensional tensor-product
+strategies with a pure unit state. The field and its self-dual normal basis
+are chosen once for each admissible field size. The parameter structures in
+`Challenge.lean` state the positive-integer and divisibility conditions.
+The four declarations are in the namespace `MIPStarRE.QPBT.Palomar`:
 
-It also registers the definition frontier
-`MIPStarRE.QPBT.fixedFieldModel` and permits only `propext`, `Quot.sound`, and
-`Classical.choice`.
+- `exists_spcc_value_one`: for every admissible Pauli-test parameter tuple,
+  there is a symmetric, projective, consistent strategy whose measurements
+  commute on supported question pairs and whose winning probability is one.
+- `exists_ld_soundness`: universal constants `a ≥ 1` and `0 < b ≤ 1` work
+  for every admissible low-degree parameter tuple and every projective
+  strategy winning with probability at least `1 − ε`, for `ε > 0`.
+  Alice and Bob have polynomial-valued measurements satisfying the three
+  point/polynomial and polynomial/polynomial consistency estimates, each
+  bounded by `a (dmk)^a (ε^b + q^(-b) + 2^(-bmd))`.
+- `pauli_soundness`: universal constants `a ≥ 1` and `0 < b < 1` work for
+  every admissible tuple, `ε ≥ 0`, and strategy winning with probability at
+  least `1 − ε`. Local isometries extract the prescribed maximally entangled
+  qudits and an auxiliary state. The state norm error and each player's
+  squared Pauli-operator error sum are separately bounded by
+  `a (md)^a (ε^b + q^(-b) + 2^(-bmd))`.
+- `pauli_soundness_qubit`: the same conclusion in the qubit coordinates of
+  the fixed self-dual basis, with the same error form and quantifier order.
 
-## What The Check Establishes
+These are the statements labelled `lem:pauli-completeness`,
+`lem:ld-soundness`, `thm:pauli`, and `cor:pauli-binary` in
+[MIP*=RE](https://arxiv.org/abs/2001.04383). The library proves exact
+correspondences between its original statements and these compact versions.
+The inherited zero-direction convention and alternative low-degree proof
+route are documented in the substantive repository's paper-gap notes.
+This wrapper does not claim a formalization of the whole MIP*=RE theorem.
 
-The official comparator exports the Challenge and Solution environments and
-compares the registered declaration closures. A successful full run would
-establish equality of the four theorem statements and the selector type, then
-check the solution values transitively against the permitted axioms and the
-configured independent kernels. This source-only draft has not completed that
-run.
+## Independent statement and proof
 
-## Layout
-
-`Challenge.lean` is the complete independent statement surface: one
-Mathlib-only module, 989 physical lines and 51,979 UTF-8 bytes. Its audited
-SHA-256 is
+`Challenge.lean` is one Mathlib-only module, with 989 physical lines and
+51,979 bytes. It contains the full verifier, parameter and strategy definitions,
+fixed-field contract, and error quantities. Its SHA-256 is
 `acb66991fbdbc80a9c5d0a7e522f572ba604e6c88b2907f9c43a477438ebe6f8`.
-The only intended holes are the fixed-field selector value and the four
-registered theorem bodies.
+It exceeds Palomar's preferred review size but meets its hard limits.
 
-`Solution.lean` is a thin module importing exactly
-`MIPStarRE.QPBT.Palomar.PauliCompleteness`,
-`MIPStarRE.QPBT.Palomar.LowDegreeSoundness`, and
-`MIPStarRE.QPBT.Palomar.PauliSoundness`. `QPBTComparator.lean` only re-exports
-that solution module. No generated helper Lean files remain in this wrapper.
+The only deliberate holes are the four theorem proofs and the value of
+`MIPStarRE.QPBT.fixedFieldModel`. That definition's full type is compared;
+its library implementation constructs the field and basis and is audited
+transitively. It is not an extra assumption in the Solution.
+`Solution.lean` imports the three proved compact-result modules.
 
-## Official Caller
+`comparator.json` permits only `propext`, `Quot.sound`, and `Classical.choice`.
+The GitHub Actions workflow calls the official Palomar full verification
+workflow at `65f0154ed776cd26c224254aa57b379137f28b0d`, using the hosted
+`palomar-standard-v1` profile, Comparator, NanoDa, and con-ron. A successful
+run is evidence for its exact commit only; it is not registry acceptance.
 
-`.github/workflows/comparator.yml` is the pinned native caller for
-`PalomarRegistry/PalomarSubmission` revision
-`65f0154ed776cd26c224254aa57b379137f28b0d`. It requests full mode with the
-hosted `palomar-standard-v1` execution profile and binds both the reusable
-workflow and pipeline revision to that commit. There is no local substitute
-verifier; the authenticated workflow artifact is required for final evidence.
+## Provenance and local checks
 
-## Preparation Checks
+Ruixuan Deng is the responsible owner. The development is AI-generated;
+no human mathematical or code review beyond the owner's decisions is claimed.
+Agent review and operator self-assessment are distinct from human approval.
+See `formalization.yaml` for the source, credit, and automation disclosures.
 
-The non-executing checker validates the metadata schema, repository layout,
-module headers, size limits, immutable pins, Challenge import spelling, and the
-shape of a supplied official report:
+The local checker validates the metadata schema, source sizes and headers,
+immutable pins, and the supplied official report. Artifact authenticity must
+also be checked against the matching GitHub Actions run.
 
 ```sh
 python3 -m unittest discover -s tools/palomar/tests -v
 python3 tools/palomar/check.py report \
   --substantive-repo /path/to/MIPStarRE-QPBT \
-  --output reports/palomar-mechanical.json
+  --official-report /path/to/official-report.json \
+  --output /path/to/final-mechanical.json
 ```
 
-The report is intentionally red or unknown where runtime evidence is absent.
-Static checks do not prove statement equality, proof completion, axiom closure,
-resolved transitive import origins, or registry acceptance. Requirement records
-in `checks` determine `overall`; non-certifying lexical observations are kept
-separately in `diagnostics` and never replace missing runtime evidence.
-
-## Pending Integration
-
-The Lake files still carry the historical MIPStarRE-A pin
-`ecb97d1f66eec1e6fad964f144f78b91ce1fab36` and Lean/Mathlib v4.32.0. That
-revision does not contain the compact solution modules, and v4.32.0 is below
-the v4.35.0-rc2 minimum recorded by the pinned policy. The regenerated report
-also measures that historical substantive tree at 1,809,506,272 bytes, above
-the 500 MiB cap, and records its source-module requirements as failing. The
-dependency URL, final main-reachable library revision, final supported-version
-manifest, completed module migration, native comparator run, authenticated
-runtime artifact, and independent exact-head review all remain pending. They
-must move together; this draft is not ready for submission.
+Final evidence and the exact submission SHA are recorded in the substantive
+repository's `docs/palomar-submission.md`. The final report is stored there so
+recording it does not change the wrapper commit it verifies. No submission has
+been made.
