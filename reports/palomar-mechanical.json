@@ -25,7 +25,7 @@
     {
       "details": {
         "byte_limit": 524288000,
-        "bytes": 314610,
+        "bytes": 327154,
         "compiled_artifacts": [],
         "submodules": []
       },
@@ -322,7 +322,7 @@
     {
       "details": {
         "canonical_repository": "Dengnifer/MIPStarRE-QPBT",
-        "main_commit": "15767da684dd6a48c100ce92997033402fdcb228",
+        "main_commit": "024f20ac44aa92cb24809d128d4aad130783b6e3",
         "main_ref": "refs/remotes/github/main",
         "remote": "github",
         "remote_url": "git@github.com:Dengnifer/MIPStarRE-QPBT.git",
@@ -335,7 +335,23 @@
     },
     {
       "details": {
+        "byte_limit": 524288000,
+        "bytes": 1809506272,
+        "excluded_symlink_count": 0,
+        "measurement": "git ls-tree regular blobs plus git cat-file --batch-check sizes",
+        "regular_files": 5518,
+        "revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+      },
+      "evidence": "static",
+      "id": "source.substantive_size_cap",
+      "status": "fail",
+      "summary": "pinned substantive source exceeds the 500 MiB cap"
+    },
+    {
+      "details": {
         "files_checked": 711,
+        "lean_symlink_count": 0,
+        "lean_symlinks": [],
         "maximum_lines": 1000,
         "missing_module_count": 711,
         "missing_module_examples": [
@@ -390,15 +406,20 @@
           "MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic/PointSwap.lean",
           "MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic/Reindexing.lean"
         ],
+        "note": "Only .lean symlinks are rejected by the source scan; all symlink blobs are excluded from the size cap, matching the official checkout measurement.",
+        "submodule_count": 0,
         "submodules": [],
+        "symlink_count": 0,
         "symlinks": [],
         "too_long_count": 0,
-        "too_long_examples": []
+        "too_long_examples": [],
+        "tracked_lfs_count": 0,
+        "tracked_lfs_paths": []
       },
       "evidence": "static",
       "id": "source.substantive_requirements",
       "status": "fail",
-      "summary": "pinned substantive Lean sources fail module or line requirements"
+      "summary": "pinned substantive source fails Lean or preservation requirements"
     },
     {
       "details": {
@@ -677,8 +698,10 @@
     "substantive": {
       "lean_files": 711,
       "lean_sources_sha256": "5cebce9ec027b919288f05d23adbffe3c4a8940ae88397b3b4b91e7f65d008f6",
+      "regular_files": 5518,
       "repository": "Dengnifer/MIPStarRE-QPBT",
       "revision": "ecb97d1f66eec1e6fad964f144f78b91ce1fab36",
+      "source_bytes": 1809506272,
       "special_files": {
         "LICENSE": {
           "bytes": 11358,
@@ -980,22 +1003,22 @@
           "sha256": "a7383b35c37dbefab8f996ab3d3856002531602931a877b789a095985f89977e"
         },
         {
-          "bytes": 4555,
+          "bytes": 5460,
           "kind": "file",
           "path": "tools/palomar/README.md",
-          "sha256": "f9d476f639d6c20b9b667f20c05be6d7985ea9d0bdde56fdb8e985d7faf145e0"
+          "sha256": "55eb608044c03adeca70b888aeeda6e3aa6813f2ef7f46225ad8df24a2939f0b"
         },
         {
-          "bytes": 64546,
+          "bytes": 71861,
           "kind": "file",
           "path": "tools/palomar/check.py",
-          "sha256": "91f5cdf38ff0e75775f4e1ee7f02b311ef3a4fcd5e02bc6c5305031817a81e2c"
+          "sha256": "91d1e0a77ee54f322012a32cdda03b96254b7cb47018b1c37eb9235a07feaeef"
         },
         {
-          "bytes": 17379,
+          "bytes": 21703,
           "kind": "file",
           "path": "tools/palomar/tests/test_check.py",
-          "sha256": "4a0585a05724a389ad1d459d83fe1cbfd936f96d96a762ce7d5bffcd8e1eee0c"
+          "sha256": "afc9ceb1fc148cb1ae75bb5ceaf3bbe74aad8bc70b299756e7a3bfd3e6327a40"
         },
         {
           "bytes": 1686,
@@ -1022,7 +1045,7 @@
           "sha256": "de3959724718b719da979b467f364219c6ce6f47a98c98167eddedfb0bf7f9ec"
         }
       ],
-      "sha256": "87fc463fbb3e764ecec94006fae1fdd928bf0ae1287bc1b4d9f3204dbd12dd28"
+      "sha256": "71bb073cd5dce1fb8b0bbee590ad24eefa2ad7a6ed258207ad8874eef1c9a021"
     }
   },
   "overall": "fail",

@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import tomllib
 from dataclasses import asdict, dataclass, field
 from pathlib import Path, PurePosixPath
@@ -160,12 +161,18 @@ def has_module_header(text: str) -> bool:
     return False
 
 
-def run_git(root: Path, *args: str, input_bytes: bytes | None = None) -> subprocess.CompletedProcess:
+def run_git(
+    root: Path,
+    *args: str,
+    input_bytes: bytes | None = None,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess:
     return subprocess.run(
         ["git", "-C", str(root), *args],
         input=input_bytes,
         capture_output=True,
         check=False,
+        env=env,
     )
 
 
@@ -305,6 +312,20 @@ def regular_file_within_limit(path: Path, limit: int) -> tuple[bool, int | None]
     return size <= limit, size
 
 
+def parse_lfs_attributes(output: bytes) -> list[str]:
+    fields = output.split(b"\0")
+    if fields and fields[-1] == b"":
+        fields.pop()
+    if len(fields) % 3:
+        raise ValueError("git check-attr returned malformed output")
+    lfs: list[str] = []
+    for position in range(0, len(fields), 3):
+        path, attribute, value = fields[position:position + 3]
+        if attribute == b"filter" and value == b"lfs":
+            lfs.append(path.decode("utf-8"))
+    return sorted(lfs)
+
+
 def tracked_lfs_paths(root: Path) -> list[str]:
     tracked = run_git(root, "ls-files", "-z")
     if tracked.returncode != 0:
@@ -317,17 +338,28 @@ def tracked_lfs_paths(root: Path) -> list[str]:
     )
     if attributes.returncode != 0:
         raise ValueError(attributes.stderr.decode("utf-8", "replace").strip())
-    fields = attributes.stdout.split(b"\0")
-    if fields and fields[-1] == b"":
-        fields.pop()
-    if len(fields) % 3:
-        raise ValueError("git check-attr returned malformed output")
-    lfs: list[str] = []
-    for position in range(0, len(fields), 3):
-        path, attribute, value = fields[position:position + 3]
-        if attribute == b"filter" and value == b"lfs":
-            lfs.append(path.decode("utf-8"))
-    return sorted(lfs)
+    return parse_lfs_attributes(attributes.stdout)
+
+
+def tracked_lfs_paths_at_revision(repo: Path, revision: str) -> list[str]:
+    with tempfile.TemporaryDirectory(prefix="palomar-git-index-") as directory:
+        env = os.environ.copy()
+        env["GIT_INDEX_FILE"] = str(Path(directory) / "index")
+        loaded = run_git(repo, "read-tree", revision, env=env)
+        if loaded.returncode != 0:
+            raise ValueError(loaded.stderr.decode("utf-8", "replace").strip())
+        tracked = run_git(repo, "ls-files", "-z", env=env)
+        if tracked.returncode != 0:
+            raise ValueError(tracked.stderr.decode("utf-8", "replace").strip())
+        if not tracked.stdout:
+            return []
+        attributes = run_git(
+            repo, "check-attr", "--cached", "-z", "filter", "--stdin",
+            input_bytes=tracked.stdout, env=env,
+        )
+        if attributes.returncode != 0:
+            raise ValueError(attributes.stderr.decode("utf-8", "replace").strip())
+        return parse_lfs_attributes(attributes.stdout)
 
 
 def parse_version(value: str) -> tuple[int, int, int, int]:
@@ -401,6 +433,28 @@ def git_tree_entries(repo: Path, revision: str) -> list[tuple[str, str, str]]:
     return entries
 
 
+def git_blob_sizes(repo: Path, object_ids: Iterable[str]) -> dict[str, int]:
+    requested = list(dict.fromkeys(object_ids))
+    if not requested:
+        return {}
+    proc = run_git(
+        repo, "cat-file", "--batch-check",
+        input_bytes=b"".join(object_id.encode("ascii") + b"\n" for object_id in requested),
+    )
+    if proc.returncode != 0:
+        raise ValueError(proc.stderr.decode("utf-8", "replace").strip())
+    lines = proc.stdout.splitlines()
+    if len(lines) != len(requested):
+        raise ValueError("git cat-file returned the wrong number of size records")
+    sizes: dict[str, int] = {}
+    for expected_id, raw in zip(requested, lines, strict=True):
+        header = raw.decode("ascii").split()
+        if len(header) != 3 or header[0] != expected_id or header[1] != "blob":
+            raise ValueError(f"unexpected git cat-file size record for {expected_id}: {header}")
+        sizes[expected_id] = int(header[2])
+    return sizes
+
+
 def git_blob_map(repo: Path, entries: Iterable[tuple[str, str]]) -> dict[str, bytes]:
     requested = list(entries)
     unique_ids = list(dict.fromkeys(object_id for _, object_id in requested))
@@ -423,18 +477,30 @@ def git_blob_map(repo: Path, entries: Iterable[tuple[str, str]]) -> dict[str, by
     return {path: contents[object_id] for path, object_id in requested}
 
 
-def inspect_substantive(repo: Path, revision: str, line_cap: int, module_exempt: set[str]) -> dict[str, Any]:
+def inspect_substantive(
+    repo: Path, revision: str, line_cap: int, module_exempt: set[str],
+) -> dict[str, Any]:
     commit = run_git(repo, "cat-file", "-e", f"{revision}^{{commit}}")
     if commit.returncode != 0:
         raise ValueError(f"revision {revision} is not present in {repo}")
     entries = git_tree_entries(repo, revision)
     symlinks = [path for mode, _, path in entries if mode == "120000"]
+    lean_symlinks = [path for path in symlinks if path.endswith(".lean")]
     submodules = [path for mode, _, path in entries if mode == "160000"]
-    lean_entries = [(path, object_id) for mode, object_id, path in entries if path.endswith(".lean") and mode != "160000"]
+    regular_entries = [
+        (path, object_id) for mode, object_id, path in entries if mode.startswith("100")
+    ]
+    sizes = git_blob_sizes(repo, (object_id for _, object_id in regular_entries))
+    source_bytes = sum(sizes[object_id] for _, object_id in regular_entries)
+    lfs_paths = tracked_lfs_paths_at_revision(repo, revision)
+    lean_entries = [
+        (path, object_id) for mode, object_id, path in entries
+        if path.endswith(".lean") and mode.startswith("100")
+    ]
     requested = list(lean_entries)
     for special in ("lean-toolchain", "lake-manifest.json", "lakefile.toml", "lakefile.lean", "LICENSE"):
         for mode, object_id, path in entries:
-            if path == special and mode != "160000":
+            if path == special and mode.startswith("100"):
                 requested.append((path, object_id))
                 break
     blobs = git_blob_map(repo, requested)
@@ -445,8 +511,16 @@ def inspect_substantive(repo: Path, revision: str, line_cap: int, module_exempt:
         {
             "revision": revision,
             "tree": tree.stdout.decode("ascii").strip(),
+            "source_bytes": source_bytes,
+            "regular_files": len(regular_entries),
             "symlinks": symlinks[:50],
+            "symlink_count": len(symlinks),
+            "lean_symlinks": lean_symlinks[:50],
+            "lean_symlink_count": len(lean_symlinks),
             "submodules": submodules[:50],
+            "submodule_count": len(submodules),
+            "tracked_lfs_paths": lfs_paths[:50],
+            "tracked_lfs_count": len(lfs_paths),
             "special_files": {
                 name: {"sha256": sha256_bytes(data), "bytes": len(data)}
                 for name, data in blobs.items() if not name.endswith(".lean")
@@ -455,6 +529,32 @@ def inspect_substantive(repo: Path, revision: str, line_cap: int, module_exempt:
         }
     )
     return scan
+
+
+def substantive_source_cap_check(evidence: dict[str, Any], byte_limit: int) -> Check:
+    source_bytes = evidence["source_bytes"]
+    within_limit = source_bytes <= byte_limit
+    cap_label = (
+        f"{byte_limit // (1024 * 1024)} MiB"
+        if byte_limit % (1024 * 1024) == 0
+        else f"{byte_limit}-byte"
+    )
+    return Check(
+        "source.substantive_size_cap", "pass" if within_limit else "fail", "static",
+        (
+            f"pinned substantive source is within the {cap_label} cap"
+            if within_limit
+            else f"pinned substantive source exceeds the {cap_label} cap"
+        ),
+        {
+            "bytes": source_bytes,
+            "byte_limit": byte_limit,
+            "revision": evidence["revision"],
+            "regular_files": evidence["regular_files"],
+            "excluded_symlink_count": evidence["symlink_count"],
+            "measurement": "git ls-tree regular blobs plus git cat-file --batch-check sizes",
+        },
+    )
 
 
 def substantive_main_pin_check(repo: Path, revision: str, canonical: str) -> Check:
@@ -612,14 +712,42 @@ def official_report_checks(
         if not isinstance(requested, dict):
             errors.append("submission.requested_paths must be an object")
             requested = {}
-        selected_paths = {
-            "project_path": expected_project,
-            "comparator_config_path": normalize_repository_path(config["comparator_config_path"]),
-            "formalization_metadata_path": normalize_repository_path(config["metadata_path"]),
-        }
-        for key, expected in selected_paths.items():
-            if normalize_repository_path(requested.get(key)) != expected:
-                errors.append(f"requested {key} does not match the selected local path")
+        expected_comparator = normalize_repository_path(config["comparator_config_path"])
+        expected_metadata = normalize_repository_path(config["metadata_path"])
+        requested_project = requested.get("project_path")
+        if not isinstance(requested_project, str):
+            errors.append("requested project_path must be a string")
+        elif normalize_repository_path(requested_project or ".") != expected_project:
+            errors.append("requested project_path does not match the selected local path")
+        requested_comparator = requested.get("comparator_config_path")
+        if not isinstance(requested_comparator, str):
+            errors.append("requested comparator_config_path must be a string")
+        elif normalize_repository_path(requested_comparator) != expected_comparator:
+            errors.append("requested comparator_config_path does not match the selected local path")
+
+        formalization_record = official.get("formalization")
+        selected_metadata = (
+            normalize_repository_path(formalization_record.get("path"))
+            if isinstance(formalization_record, dict)
+            else None
+        )
+        default_metadata = (
+            "formalization.yaml"
+            if expected_project == "."
+            else (PurePosixPath(str(expected_project)) / "formalization.yaml").as_posix()
+        )
+        requested_metadata = requested.get("formalization_metadata_path")
+        if not isinstance(requested_metadata, str):
+            errors.append("requested formalization_metadata_path must be a string")
+        elif requested_metadata:
+            if normalize_repository_path(requested_metadata) != expected_metadata:
+                errors.append(
+                    "requested formalization_metadata_path does not match the selected local path"
+                )
+        elif selected_metadata != default_metadata:
+            errors.append(
+                "defaulted formalization_metadata_path does not match the selected report file"
+            )
         if normalize_repository_path(source.get("project_path")) != expected_project:
             errors.append("source.project_path does not match the selected project")
 
@@ -651,7 +779,7 @@ def official_report_checks(
             if not local_path.is_file() or record.get("sha256") != sha256_file(local_path):
                 errors.append(f"{label}.sha256 does not match the selected local file")
 
-        check_file_record("formalization", official.get("formalization"), config["metadata_path"])
+        check_file_record("formalization", formalization_record, config["metadata_path"])
         check_file_record("comparator", comparator, config["comparator_config_path"])
         check_file_record("lakefile", official.get("lakefile"), "lakefile.toml")
         check_file_record("lake_manifest", official.get("lake_manifest"), "lake-manifest.json")
@@ -1235,6 +1363,12 @@ def run_checks(
             expected_revision=dependency_revision, canonical_repository=canonical,
         )
         add(
+            checks, "source.substantive_size_cap", "unknown", "static",
+            "no local substantive repository was supplied for the pinned-tree size check",
+            expected_revision=dependency_revision,
+            byte_limit=policy["limits"]["source_bytes"],
+        )
+        add(
             checks, "source.substantive_requirements", "unknown", "static",
             "no local substantive repository was supplied for the pinned-revision source scan",
             expected_revision=dependency_revision,
@@ -1254,23 +1388,44 @@ def run_checks(
                 substantive_repo.resolve(), dependency_revision,
                 policy["limits"]["lean_source_lines"], module_exempt,
             )
+            checks.append(
+                substantive_source_cap_check(
+                    substantive_evidence, policy["limits"]["source_bytes"]
+                )
+            )
             substantive_ok = (
                 not substantive_evidence["missing_module_count"]
                 and not substantive_evidence["too_long_count"]
                 and not substantive_evidence["invalid_utf8_count"]
-                and not substantive_evidence["symlinks"]
-                and not substantive_evidence["submodules"]
+                and not substantive_evidence["lean_symlink_count"]
+                and not substantive_evidence["submodule_count"]
+                and not substantive_evidence["tracked_lfs_count"]
             )
             add(
                 checks, "source.substantive_requirements", "pass" if substantive_ok else "fail", "static",
-                "pinned substantive Lean sources meet module and line requirements" if substantive_ok else "pinned substantive Lean sources fail module or line requirements",
+                (
+                    "pinned substantive source meets Lean and preservation requirements"
+                    if substantive_ok
+                    else "pinned substantive source fails Lean or preservation requirements"
+                ),
                 files_checked=substantive_evidence["files_checked"],
                 missing_module_count=substantive_evidence["missing_module_count"],
                 missing_module_examples=substantive_evidence["missing_module_examples"],
                 too_long_count=substantive_evidence["too_long_count"],
                 too_long_examples=substantive_evidence["too_long_examples"],
                 maximum_lines=substantive_evidence["maximum_lines"],
-                symlinks=substantive_evidence["symlinks"], submodules=substantive_evidence["submodules"],
+                symlinks=substantive_evidence["symlinks"],
+                symlink_count=substantive_evidence["symlink_count"],
+                lean_symlinks=substantive_evidence["lean_symlinks"],
+                lean_symlink_count=substantive_evidence["lean_symlink_count"],
+                submodules=substantive_evidence["submodules"],
+                submodule_count=substantive_evidence["submodule_count"],
+                tracked_lfs_paths=substantive_evidence["tracked_lfs_paths"],
+                tracked_lfs_count=substantive_evidence["tracked_lfs_count"],
+                note=(
+                    "Only .lean symlinks are rejected by the source scan; all symlink blobs are "
+                    "excluded from the size cap, matching the official checkout measurement."
+                ),
             )
             blobs = substantive_evidence["_blobs"]
             substantive_toolchain = blobs.get("lean-toolchain", b"").decode("utf-8", "replace").strip()
@@ -1291,6 +1446,13 @@ def run_checks(
                 wrapper_mathlib=mathlib.get("rev"), substantive_mathlib=substantive_mathlib.get("rev"),
             )
         except Exception as error:
+            if substantive_evidence is None:
+                add(
+                    checks, "source.substantive_size_cap", "fail", "static",
+                    f"could not measure the pinned substantive revision: {error}",
+                    revision=dependency_revision,
+                    byte_limit=policy["limits"]["source_bytes"],
+                )
             add(
                 checks, "source.substantive_requirements", "fail", "static",
                 f"could not inspect the pinned substantive revision: {error}",
@@ -1342,6 +1504,8 @@ def run_checks(
             "repository": canonical,
             "revision": substantive_evidence["revision"],
             "tree": substantive_evidence["tree"],
+            "source_bytes": substantive_evidence["source_bytes"],
+            "regular_files": substantive_evidence["regular_files"],
             "lean_files": substantive_evidence["files_checked"],
             "lean_sources_sha256": substantive_evidence["content_sha256"],
             "special_files": substantive_evidence["special_files"],

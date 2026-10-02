@@ -83,16 +83,15 @@ class PalomarCheckTests(unittest.TestCase):
             "workflow_url": "https://github.com/PalomarRegistry/PalomarSubmission/actions/runs/1",
             "submission": {
                 "requested_paths": {
-                    "project_path": ".",
+                    "project_path": "",
                     "comparator_config_path": "comparator.json",
-                    "formalization_metadata_path": "formalization.yaml",
+                    "formalization_metadata_path": "",
                 }
             },
             "source": {
                 "repository": config["wrapper_repository"],
                 "repository_url": f"https://github.com/{config['wrapper_repository']}",
                 "commit": head,
-                "project_path": ".",
             },
             "formalization": {
                 "path": "formalization.yaml",
@@ -314,6 +313,49 @@ class PalomarCheckTests(unittest.TestCase):
             )
             self.assertEqual(unknown.status, "unknown")
 
+    def test_substantive_size_uses_pinned_regular_tree_not_worktree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            self.init_repo(root)
+            (root / "first.bin").write_bytes(b"1234")
+            (root / "second.bin").write_bytes(b"1234")
+            (root / "link").symlink_to("first.bin")
+            revision = self.commit_all(root)
+
+            (root / "first.bin").write_bytes(b"x" * 100)
+            (root / ".lake").mkdir()
+            (root / ".lake/untracked.bin").write_bytes(b"x" * 1000)
+            evidence = CHECK.inspect_substantive(root, revision, 10_000, {"lakefile.lean"})
+
+            self.assertEqual(evidence["source_bytes"], 8)
+            self.assertEqual(evidence["regular_files"], 2)
+            self.assertEqual(evidence["symlinks"], ["link"])
+            self.assertEqual(CHECK.substantive_source_cap_check(evidence, 8).status, "pass")
+            rejected = CHECK.substantive_source_cap_check(evidence, 7)
+            self.assertEqual(rejected.status, "fail")
+            self.assertEqual(rejected.details["revision"], revision)
+            self.assertEqual(rejected.details["bytes"], 8)
+
+    def test_substantive_preservation_uses_pinned_lfs_and_gitlinks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            self.init_repo(root)
+            (root / ".gitattributes").write_text("*.bin filter=lfs\n")
+            (root / "payload.bin").write_text("ordinary contents\n")
+            (root / "Alias.lean").symlink_to("payload.bin")
+            base = self.commit_all(root, "base")
+            self.git(root, "update-index", "--add", "--cacheinfo", f"160000,{base},vendor/source")
+            self.git(root, "commit", "-q", "-m", "gitlink")
+            revision = self.git(root, "rev-parse", "HEAD")
+
+            (root / ".gitattributes").write_text("*.bin -filter\n")
+            evidence = CHECK.inspect_substantive(root, revision, 10_000, {"lakefile.lean"})
+            self.assertEqual(evidence["tracked_lfs_paths"], ["payload.bin"])
+            self.assertEqual(evidence["submodules"], ["vendor/source"])
+            self.assertEqual(evidence["lean_symlinks"], ["Alias.lean"])
+
     def test_real_shaped_report_content_is_not_labeled_authenticated(self):
         with tempfile.TemporaryDirectory() as directory:
             root, path, config, _ = self.report_fixture(directory)
@@ -323,6 +365,51 @@ class PalomarCheckTests(unittest.TestCase):
                 {item.evidence for item in checks.values()}, {"report-content"}
             )
             self.assertIn("content only", checks["proof.report_content"].details["note"])
+
+    def test_report_metadata_request_default_explicit_and_selected_records(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, path, config, report = self.report_fixture(directory)
+            self.assertEqual(
+                self.report_statuses(root, path, config)["proof.report_content"].status,
+                "pass",
+            )
+
+            explicit = copy.deepcopy(report)
+            explicit["submission"]["requested_paths"][
+                "formalization_metadata_path"
+            ] = "formalization.yaml"
+            path.write_text(json.dumps(explicit), encoding="utf-8")
+            self.assertEqual(
+                self.report_statuses(root, path, config)["proof.report_content"].status,
+                "pass",
+            )
+
+            variants = {
+                "wrong_explicit": lambda value: value["submission"]["requested_paths"].update(
+                    formalization_metadata_path="metadata/formalization.yaml"
+                ),
+                "wrong_selected_path": lambda value: value["formalization"].update(
+                    path="metadata/formalization.yaml"
+                ),
+                "wrong_selected_hash": lambda value: value["formalization"].update(
+                    sha256="0" * 64
+                ),
+                "wrong_project": lambda value: value["submission"]["requested_paths"].update(
+                    project_path="nested"
+                ),
+                "wrong_comparator": lambda value: value["submission"]["requested_paths"].update(
+                    comparator_config_path="other.json"
+                ),
+            }
+            for name, mutate in variants.items():
+                candidate = copy.deepcopy(report)
+                mutate(candidate)
+                path.write_text(json.dumps(candidate), encoding="utf-8")
+                with self.subTest(case=name):
+                    self.assertEqual(
+                        self.report_statuses(root, path, config)["proof.report_content"].status,
+                        "fail",
+                    )
 
     def test_report_content_rejects_wrong_head_and_declaration_variants(self):
         with tempfile.TemporaryDirectory() as directory:

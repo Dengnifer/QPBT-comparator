@@ -33,12 +33,21 @@ Evidence classes are explicit:
 - `static` checks repository bytes, source text, Lake metadata, imports, and
   comparator configuration. Static checks cannot certify a proof or an axiom
   closure. In particular, the Challenge import check proves only that direct
-  import spellings use approved prefixes and do not name local files.
+  import spellings use approved prefixes and do not name local files. For a
+  separately pinned substantive repository, the checker measures every regular
+  tracked blob at the declared revision with Git object-size metadata, enforces
+  the official 500 MiB cap, and checks that revision for submodules and cached
+  `filter=lfs` attributes. Dirty files, untracked files, `.lake`, and symlink
+  blob contents do not affect that immutable-tree measurement; `.lean`
+  symlinks remain a source-requirements failure.
 - `report-content` parses a supplied full-run JSON report in the producer's
   real shape. It checks the exact source commit and selected paths, declaration
   and axiom lists, the top-level `kernels` records, and the byte-digested JSON
   string in `protected_config`. It also checks the report's resolved Challenge
-  origins. This class does not authenticate where the JSON came from.
+  origins. The official report records omitted optional path inputs as empty
+  strings, so an empty metadata request is accepted only when the selected
+  report record is the default project `formalization.yaml` with the local
+  file's digest. This class does not authenticate where the JSON came from.
 
 Pass a runtime report with `--official-report` only after the companion-review
 lane has bound its artifact to the pinned workflow revision and exact
@@ -80,6 +89,9 @@ checks `unknown`. A matching report-content check is not registry acceptance.
 - Replace the old split Challenge and old library pin, add the four compact
   `MIPStarRE.QPBT.Palomar` aliases and `MIPStarRE.QPBT.fixedFieldModel` to the
   actual comparator configuration, then regenerate this report.
+- Replace the current archive-heavy substantive pin with a losslessly compacted
+  revision below Palomar's 500 MiB source cap. Until then the preparation report
+  must remain red and record the measured committed-tree byte count.
 - Confirm the final toolchain against Palomar's then-current minimum and update
   the vendored policy snapshots if upstream changed.
 - Keep `review.status: unchecked` until a real human review is recorded.
