@@ -41,10 +41,10 @@ This wrapper does not claim a formalization of the whole MIP*=RE theorem.
 
 ## Independent statement and proof
 
-`Challenge.lean` is one Mathlib-only module, with 989 physical lines and
-51,979 bytes. It contains the full verifier, parameter and strategy definitions,
+`Challenge.lean` is one Mathlib-only module, with 994 physical lines and
+52,141 bytes. It contains the full verifier, parameter and strategy definitions,
 fixed-field contract, and error quantities. Its SHA-256 is
-`acb66991fbdbc80a9c5d0a7e522f572ba604e6c88b2907f9c43a477438ebe6f8`.
+`74f16feefedf98b442a143836d8a720e39748561ebdd32e8e8041b55b2621bc3`.
 It exceeds Palomar's preferred review size but meets its hard limits.
 
 The only deliberate holes are the four theorem proofs and the value of

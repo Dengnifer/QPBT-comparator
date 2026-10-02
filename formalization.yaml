@@ -18,7 +18,7 @@ repository:
   role: "thin-wrapper"
   substantive_formalization:
     id: "Dengnifer/MIPStarRE-QPBT"
-    revision: "8baaa22256aa5ff7946c82efc1fefcf95f97abbc"
+    revision: "271e2d96a72c55b4b7432187afaa1f7d747aaa4e"
 
 classification:
   arxiv:
