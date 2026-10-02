@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "project_path": ".",
+  "metadata_path": "formalization.yaml",
+  "comparator_config_path": "comparator.json",
+  "report_path": "reports/palomar-mechanical.json",
+  "wrapper_repository": "Dengnifer/QPBT-comparator",
+  "substantive_dependency_name": "MIPStarRE",
+  "canonical_substantive_repository": "Dengnifer/MIPStarRE-QPBT",
+  "expected_theorems": [
+    "MIPStarRE.QPBT.Palomar.exists_spcc_value_one",
+    "MIPStarRE.QPBT.Palomar.exists_ld_soundness",
+    "MIPStarRE.QPBT.Palomar.pauli_soundness",
+    "MIPStarRE.QPBT.Palomar.pauli_soundness_qubit"
+  ],
+  "expected_definitions": [
+    "MIPStarRE.QPBT.fixedFieldModel"
+  ],
+  "expected_kernel_names": [
+    "nanoda",
+    "con-ron"
+  ],
+  "expected_challenge_repositories": [
+    "leanprover-community/mathlib4"
+  ],
+  "trusted_challenge_prefixes": [
+    "Init",
+    "Lean",
+    "Std",
+    "Mathlib"
+  ],
+  "challenge_limits": {
+    "lines": 1000,
+    "bytes": 102400
+  },
+  "required_disclosures": [
+    "AI-generated",
+    "No human review"
+  ],
+  "upstream": {
+    "formalization_schema": {
+      "path": "tools/palomar/upstream/formalization-v0.4.schema.json",
+      "url": "https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/99c678e569c7c4c0772db297c5ddd5e4c9b6322e/schema/v0.4.schema.json",
+      "revision": "99c678e569c7c4c0772db297c5ddd5e4c9b6322e",
+      "sha256": "25ff6b25ca4511635aff4443cf20480c15e59dddf19591c730950b442ea54fce"
+    },
+    "browser_policy": {
+      "path": "tools/palomar/upstream/browser-preflight-policy.json",
+      "url": "https://raw.githubusercontent.com/PalomarRegistry/PalomarSubmission/65f0154ed776cd26c224254aa57b379137f28b0d/browser-preflight-policy.json",
+      "revision": "65f0154ed776cd26c224254aa57b379137f28b0d",
+      "sha256": "d3d0003b7a043695c5cb06c117253e248406e0723bbfe2cac50afb703fa97046"
+    },
+    "toolchains": {
+      "path": "tools/palomar/upstream/toolchains.json",
+      "url": "https://raw.githubusercontent.com/PalomarRegistry/PalomarSubmission/65f0154ed776cd26c224254aa57b379137f28b0d/toolchains.json",
+      "revision": "65f0154ed776cd26c224254aa57b379137f28b0d",
+      "sha256": "fd40347e4b586e7c42233b35f11efb006d25033b9a7ded9565719edf7aa98354"
+    }
+  }
+}

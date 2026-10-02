@@ -9,15 +9,12 @@ maxSynthPendingDepth = 3
 
 [[require]]
 name = "MIPStarRE"
-git = "https://github.com/Dengnifer/MIPStarRE-A.git"
-# Pin to the audited library commit; bump together with a regenerated
-# Challenge.lean (see the MIPStarRE-A repository's docs/comparator.md).
-rev = "ecb97d1f66eec1e6fad964f144f78b91ce1fab36"
+git = "https://github.com/Dengnifer/MIPStarRE-QPBT.git"
+rev = "b18311e49b4ec92d7ab13f1930ecbaa8a76850e8"
 
 [[lean_lib]]
 name = "Challenge"
-# one challenge module per contributing library module
-globs = ["Challenge", "Challenge.+"]
+globs = ["Challenge"]
 
 [[lean_lib]]
 name = "Solution"
