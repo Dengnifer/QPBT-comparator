@@ -98,8 +98,10 @@ automation:
     decisions is claimed by this metadata.
 
 review:
-  status: "unchecked"
+  status: "self-assessed"
   reviewers: []
   notes: >-
-    No human mathematical or code review is claimed. Automated agent reviews
-    and historical comparator runs are not represented as human approval.
+    The compact Challenge underwent prior agent source comparison, and the
+    wrapper was self-assessed by the Codex operator. No independent final
+    wrapper review or human mathematical or code review is claimed. Automated
+    checks and agent assessments are not represented as human approval.
