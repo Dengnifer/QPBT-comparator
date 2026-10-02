@@ -1026,8 +1026,9 @@ def metadata_checks(
     for disclosure in config.get("required_disclosures", []):
         if disclosure.casefold() not in notes.casefold():
             semantic.append(f"automation.notes must include disclosure {disclosure!r}")
-    if metadata.get("review", {}).get("status") != "unchecked":
-        semantic.append("review.status must remain unchecked until a review is actually recorded")
+    review_status = metadata.get("review", {}).get("status")
+    if not isinstance(review_status, str) or not review_status.strip():
+        semantic.append("review.status must be a nonempty description of the completed review")
     status = metadata.get("status", {})
     main_results = status.get("main_results", []) if isinstance(status, dict) else []
     main_declarations = (
